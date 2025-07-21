@@ -61,7 +61,7 @@ export function calculateIBANCheckDigits(iban: string): string | null {
     } else if (char >= '0' && char <= '9') {
       numerical += char;
     } else {
-      console.error(`Invalid char: ${char}`);
+      console.error(`Invalid character in IBAN: ${char}`);
       return null;
     }
   }
