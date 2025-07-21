@@ -81,9 +81,11 @@ describe('IBAN Generator Utils', () => {
     });
 
     test('should handle non-string input', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const formatted = formatIBAN(null as any);
       expect(formatted).toBe('');
       
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const formatted2 = formatIBAN(undefined as any);
       expect(formatted2).toBe('');
     });
@@ -136,6 +138,7 @@ describe('IBAN Generator Utils', () => {
 
     test('should throw error for invalid character type', () => {
       expect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         generateRandomChars(5, 'invalid' as any);
       }).toThrow();
     });
@@ -173,7 +176,9 @@ describe('IBAN Generator Utils', () => {
     });
 
     test('should handle null/undefined input', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(calculateMod97Check(null as any)).toBe('00');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(calculateMod97Check(undefined as any)).toBe('00');
     });
 
@@ -189,6 +194,7 @@ describe('IBAN Generator Utils', () => {
   describe('getSuggestedCountry', () => {
     afterEach(() => {
       // Restore original navigator
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (window as any).navigator;
       Object.defineProperty(window, 'navigator', {
         writable: true,
@@ -239,6 +245,7 @@ describe('IBAN Generator Utils', () => {
     });
 
     test('should handle missing navigator gracefully', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (window as any).navigator;
       const country = getSuggestedCountry();
       expect(country).toBe('NL');
