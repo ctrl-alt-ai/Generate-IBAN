@@ -170,7 +170,7 @@ export function generateIBAN(country: string, bankInfo?: BankInfo | null): strin
         return null;
     }
   } catch (error) {
-    console.error(`Error BBAN parts ${country}:`, error);
+    console.error(`Error generating BBAN parts for country ${country}:`, error);
     return null;
   }
 
