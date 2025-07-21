@@ -29,9 +29,7 @@ export function generateRandomChars(length: number, type: CharacterType = 'numer
       chars = numeric;
       break;
     default:
-      console.warn(`Unknown type '${type}', using numeric.`);
-      chars = numeric;
-      break;
+      throw new Error(`Unknown character type '${type}'. Valid types are 'alphaUpper', 'alpha', 'alphanumericUpper', 'alphanumeric', 'c', 'numeric', and 'n'.`);
   }
 
   if (window.crypto && window.crypto.getRandomValues) {
