@@ -201,18 +201,9 @@ export function generateIBAN(country: string, bankInfo?: BankInfo | null): strin
   const expectedBbanLength = spec.length - 4;
 
   if (bban.length !== expectedBbanLength) {
-    console.warn(
-      `Adjusting BBAN length for ${country}: expected ${expectedBbanLength}, got ${bban.length}.`
+    throw new Error(
+      `BBAN length mismatch for ${country}: expected ${expectedBbanLength}, got ${bban.length}. BBAN: ${bban}`
     );
-    bban =
-      bban.length < expectedBbanLength
-        ? bban.padEnd(expectedBbanLength, '0')
-        : bban.substring(0, expectedBbanLength);
-
-    if (bban.length !== expectedBbanLength) {
-      console.error(`BBAN length mismatch ${country} persists. BBAN: ${bban}`);
-      return null;
-    }
   }
 
   const ibanWithoutCheck = `${country}00${bban}`;
