@@ -208,7 +208,7 @@ export function generateIBAN(country: string, bankInfo?: BankInfo | null): strin
   const checkDigits = calculateIBANCheckDigits(ibanWithoutCheck);
 
   if (!checkDigits) {
-    console.error(`Failed check digit calc ${country} BBAN: ${bban}`);
+    console.error(`Failed to calculate check digits for country ${country}. BBAN: ${bban}`);
     return null;
   }
 
