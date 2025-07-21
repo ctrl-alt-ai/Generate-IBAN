@@ -6,17 +6,18 @@ import { FranceGenerator } from './FranceGenerator';
 import { SpainGenerator } from './SpainGenerator';
 import { ItalyGenerator } from './ItalyGenerator';
 import { CountryNotSupportedError } from '../errors/IBANErrors';
-import type { IBANSpecs } from '../utils/types';
+import { ConfigLoader } from '../config/ConfigLoader';
 
 /**
  * Factory for creating country-specific IBAN generators
+ * Uses configuration from ConfigLoader for better maintainability
  */
 export class CountryGeneratorFactory {
   private generators = new Map<string, CountryGenerator>();
-  private specs: IBANSpecs;
+  private configLoader: ConfigLoader;
 
-  constructor(specs: IBANSpecs) {
-    this.specs = specs;
+  constructor() {
+    this.configLoader = ConfigLoader.getInstance();
     this.initializeGenerators();
   }
 
@@ -24,24 +25,26 @@ export class CountryGeneratorFactory {
    * Initialize all available country generators
    */
   private initializeGenerators(): void {
+    const specs = this.configLoader.getIBANSpecs();
+    
     // Initialize each country generator with its specific class
-    if (this.specs.NL) {
-      this.generators.set('NL', new NetherlandsGenerator(this.specs.NL));
+    if (specs.NL) {
+      this.generators.set('NL', new NetherlandsGenerator(specs.NL));
     }
-    if (this.specs.DE) {
-      this.generators.set('DE', new GermanyGenerator(this.specs.DE));
+    if (specs.DE) {
+      this.generators.set('DE', new GermanyGenerator(specs.DE));
     }
-    if (this.specs.BE) {
-      this.generators.set('BE', new BelgiumGenerator(this.specs.BE));
+    if (specs.BE) {
+      this.generators.set('BE', new BelgiumGenerator(specs.BE));
     }
-    if (this.specs.FR) {
-      this.generators.set('FR', new FranceGenerator(this.specs.FR));
+    if (specs.FR) {
+      this.generators.set('FR', new FranceGenerator(specs.FR));
     }
-    if (this.specs.ES) {
-      this.generators.set('ES', new SpainGenerator(this.specs.ES));
+    if (specs.ES) {
+      this.generators.set('ES', new SpainGenerator(specs.ES));
     }
-    if (this.specs.IT) {
-      this.generators.set('IT', new ItalyGenerator(this.specs.IT));
+    if (specs.IT) {
+      this.generators.set('IT', new ItalyGenerator(specs.IT));
     }
   }
 

@@ -117,7 +117,7 @@ let generatorFactory: CountryGeneratorFactory | null = null;
 
 function getGeneratorFactory(): CountryGeneratorFactory {
   if (!generatorFactory) {
-    generatorFactory = new CountryGeneratorFactory(IBAN_SPECS);
+    generatorFactory = new CountryGeneratorFactory();
   }
   return generatorFactory;
 }

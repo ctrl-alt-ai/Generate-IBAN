@@ -28,7 +28,7 @@ export class ValidationError extends IBANError {
 
 export class GenerationError extends IBANError {
   constructor(message: string, countryCode?: string) {
-    super(countryCode ? `${message} for country ${countryCode}` : message, 'GENERATION_ERROR');
+    super(countryCode !== undefined ? `${message} for country ${countryCode}` : message, 'GENERATION_ERROR');
     this.name = 'GenerationError';
   }
 }
