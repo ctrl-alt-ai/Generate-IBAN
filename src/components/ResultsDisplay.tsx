@@ -66,7 +66,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (e) {
-      console.error('Error downloading bulk:', e);
+      console.error('Error downloading bulk IBAN results:', e);
     }
   };
 
