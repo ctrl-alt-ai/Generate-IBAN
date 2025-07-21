@@ -80,7 +80,7 @@ export function calculateIBANCheckDigits(iban: string): string | null {
     const checkDigitInt = 98 - remainder;
     return checkDigitInt < 10 ? `0${checkDigitInt}` : `${checkDigitInt}`;
   } catch (e) {
-    console.error('Error calc check digits:', e, numerical);
+    console.error('Error calculating IBAN check digits:', e, numerical);
     return null;
   }
 }
