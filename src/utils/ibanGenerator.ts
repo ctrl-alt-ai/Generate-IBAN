@@ -90,7 +90,7 @@ export function calculateIBANCheckDigits(iban: string): string | null {
  */
 export function calculateMod97Check(numericString: string): string {
   if (!numericString || !/^\d+$/.test(numericString)) {
-    console.warn(`Invalid Mod97 input: ${numericString}`);
+    console.warn(`Invalid input for mod-97 calculation: ${numericString}`);
     return '00';
   }
 
