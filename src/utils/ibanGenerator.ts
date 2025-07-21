@@ -29,7 +29,7 @@ export function generateRandomChars(length: number, type: CharacterType = 'numer
       chars = numeric;
       break;
     default:
-      throw new Error(`Unknown character type '${type}'. Valid types are 'alphaUpper', 'alpha', 'alphanumericUpper', 'alphanumeric', 'c', 'numeric', and 'n'.`);
+      throw new Error(`Invalid character type: ${type}`);
   }
 
   if (window.crypto && window.crypto.getRandomValues) {
@@ -40,7 +40,7 @@ export function generateRandomChars(length: number, type: CharacterType = 'numer
       result += chars[randomValues[i] % chars.length];
     }
   } else {
-    throw new Error('Secure random number generation is not supported in this environment. Please ensure a secure environment with crypto.getRandomValues().');
+    throw new Error('Random number generation not supported in this browser.');
   }
 
   return result;
@@ -201,9 +201,7 @@ export function generateIBAN(country: string, bankInfo?: BankInfo | null): strin
   const expectedBbanLength = spec.length - 4;
 
   if (bban.length !== expectedBbanLength) {
-    throw new Error(
-      `BBAN length mismatch for ${country}: expected ${expectedBbanLength}, got ${bban.length}. BBAN: ${bban}`
-    );
+    throw new Error(`BBAN length mismatch for ${country}`);
   }
 
   const ibanWithoutCheck = `${country}00${bban}`;
