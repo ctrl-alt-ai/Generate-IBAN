@@ -116,7 +116,7 @@ export function generateIBAN(country: string, bankInfo?: BankInfo | null): strin
   const spec = IBAN_SPECS[country];
 
   if (!spec) {
-    console.error(`IBAN spec missing: ${country}`);
+    console.error(`IBAN specification not found for country: ${country}`);
     return null;
   }
 
