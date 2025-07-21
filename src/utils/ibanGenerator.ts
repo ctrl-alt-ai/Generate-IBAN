@@ -1,5 +1,7 @@
 import { IBAN_SPECS } from './constants';
 import type { BankInfo, CharacterType } from './types';
+import { CountryGeneratorFactory } from '../generators/CountryGeneratorFactory';
+import { IBANError } from '../errors/IBANErrors';
 
 /**
  * Generates random characters of specified type
@@ -48,6 +50,7 @@ export function generateRandomChars(length: number, type: CharacterType = 'numer
 
 /**
  * Calculates IBAN check digits using mod-97 algorithm
+ * @deprecated This function is now part of CountryGenerator - kept for backward compatibility
  */
 export function calculateIBANCheckDigits(iban: string): string | null {
   const rearranged = iban.substring(4) + iban.substring(0, 4);
@@ -109,110 +112,35 @@ export function calculateMod97Check(numericString: string): string {
   }
 }
 
+// Initialize the factory once
+let generatorFactory: CountryGeneratorFactory | null = null;
+
+function getGeneratorFactory(): CountryGeneratorFactory {
+  if (!generatorFactory) {
+    generatorFactory = new CountryGeneratorFactory(IBAN_SPECS);
+  }
+  return generatorFactory;
+}
+
 /**
  * Generates a single IBAN for the specified country and bank
+ * @deprecated Use the factory pattern directly for better error handling
  */
 export function generateIBAN(country: string, bankInfo?: BankInfo | null): string | null {
-  const spec = IBAN_SPECS[country];
-
-  if (!spec) {
-    console.error(`IBAN specification not found for country: ${country}`);
-    return null;
-  }
-
-  let bankCodePart = '';
-  let branchCodePart = '';
-  let accountPart = '';
-  let nationalCheckPart = '';
-  const bbanBankCode = bankInfo ? bankInfo.code : null;
-
   try {
-    switch (country) {
-      case 'NL':
-        bankCodePart =
-          bbanBankCode || generateRandomChars(spec.bankCodeLength, spec.bankCodeType);
-        accountPart = generateRandomChars(spec.accountLength, spec.accountType);
-        break;
-      case 'DE':
-        bankCodePart =
-          bbanBankCode || generateRandomChars(spec.bankCodeLength, spec.bankCodeType);
-        accountPart = generateRandomChars(spec.accountLength, spec.accountType);
-        break;
-      case 'BE':
-        bankCodePart =
-          bbanBankCode || generateRandomChars(spec.bankCodeLength, spec.bankCodeType);
-        accountPart = generateRandomChars(spec.accountLength, spec.accountType);
-        nationalCheckPart = calculateMod97Check((bankCodePart + accountPart).replace(/\D/g, ''));
-        break;
-      case 'FR':
-        bankCodePart =
-          bbanBankCode || generateRandomChars(spec.bankCodeLength, spec.bankCodeType);
-        branchCodePart = generateRandomChars(spec.branchCodeLength!, spec.branchCodeType!);
-        accountPart = generateRandomChars(spec.accountLength, spec.accountType);
-        nationalCheckPart = generateRandomChars(spec.nationalCheckLength!, spec.nationalCheckType!);
-        break;
-      case 'ES':
-        bankCodePart =
-          bbanBankCode || generateRandomChars(spec.bankCodeLength, spec.bankCodeType);
-        branchCodePart = generateRandomChars(spec.branchCodeLength!, spec.branchCodeType!);
-        accountPart = generateRandomChars(spec.accountLength, spec.accountType);
-        nationalCheckPart = generateRandomChars(spec.nationalCheckLength!, spec.nationalCheckType!);
-        break;
-      case 'IT':
-        nationalCheckPart = generateRandomChars(spec.nationalCheckLength!, spec.nationalCheckType!);
-        bankCodePart =
-          bbanBankCode || generateRandomChars(spec.bankCodeLength, spec.bankCodeType);
-        branchCodePart = generateRandomChars(spec.branchCodeLength!, spec.branchCodeType!);
-        accountPart = generateRandomChars(spec.accountLength, spec.accountType);
-        break;
-      default:
-        console.error(`Unhandled country: ${country}`);
-        return null;
-    }
+    const factory = getGeneratorFactory();
+    const generator = factory.getGenerator(country);
+    return generator.generateIBAN(bankInfo);
   } catch (error) {
-    console.error(`Error generating BBAN parts for country ${country}:`, error);
+    if (error instanceof IBANError) {
+      // Log error but return null for backward compatibility
+      console.error(error.message);
+      return null;
+    }
+    // Log unexpected errors
+    console.error(`Unexpected error generating IBAN for ${country}:`, error);
     return null;
   }
-
-  let bban = '';
-
-  switch (country) {
-    case 'IT':
-      bban = nationalCheckPart + bankCodePart + branchCodePart + accountPart;
-      break;
-    case 'FR':
-      bban = bankCodePart + branchCodePart + accountPart + nationalCheckPart;
-      break;
-    case 'ES':
-      bban = bankCodePart + branchCodePart + nationalCheckPart + accountPart;
-      break;
-    case 'BE':
-      bban = bankCodePart + accountPart + nationalCheckPart;
-      break;
-    default:
-      bban =
-        (bankCodePart || '') +
-        (branchCodePart || '') +
-        (accountPart || '') +
-        (nationalCheckPart || '');
-      break;
-  }
-
-  const expectedBbanLength = spec.length - 4;
-
-  if (bban.length !== expectedBbanLength) {
-    throw new Error(`BBAN length mismatch for ${country}`);
-  }
-
-  const ibanWithoutCheck = `${country}00${bban}`;
-  const checkDigits = calculateIBANCheckDigits(ibanWithoutCheck);
-
-  if (!checkDigits) {
-    console.error(`Failed to calculate check digits for country ${country}. BBAN: ${bban}`);
-    return null;
-  }
-
-  return `${country}${checkDigits}${bban}`;
 }
 
 /**
