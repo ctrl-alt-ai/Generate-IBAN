@@ -42,7 +42,11 @@ export function generateRandomChars(length: number, type: CharacterType = 'numer
       result += chars[randomValues[i] % chars.length];
     }
   } else {
-    throw new Error('Secure random number generation is not supported in this environment. crypto.getRandomValues is required.');
+    console.warn('Secure random number generation is not supported in this environment. Falling back to Math.random(), which is not cryptographically secure.');
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * chars.length);
+      result += chars[randomIndex];
+    }
   }
 
   return result;
