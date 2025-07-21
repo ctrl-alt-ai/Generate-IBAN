@@ -19,13 +19,8 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(ibanRaw);
       } else {
-        // Fallback for older browsers
-        const tempInput = document.createElement('textarea');
-        tempInput.value = ibanRaw;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
+        // Clipboard API not supported
+        throw new Error('Clipboard API not supported in this browser.');
       }
       
       setCopyMessage('Copied!');
