@@ -79,7 +79,7 @@ function App() {
     } catch (error) {
       console.error('Error generating IBANs:', error);
       setErrors({
-        general: `An error occurred while generating IBANs: ${error instanceof Error ? error.message : 'Unknown error'}`
+        general: 'An unexpected error occurred while generating IBANs. Please try again.'
       });
     } finally {
       setIsGenerating(false);
