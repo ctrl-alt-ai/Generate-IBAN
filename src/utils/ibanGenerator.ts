@@ -104,7 +104,7 @@ export function calculateMod97Check(numericString: string): string {
     if (remainder === 0) remainder = 97;
     return remainder < 10 ? `0${remainder}` : `${remainder}`;
   } catch (e) {
-    console.error('Error Mod97 check:', e);
+    console.error('Error during mod-97 check calculation:', e);
     return '99';
   }
 }
