@@ -57,7 +57,7 @@ describe('Country Generators', () => {
     test('should generate valid IBAN without bank info', () => {
       const iban = generator.generateIBAN();
       
-      expect(iban).toMatch(/^DE\d{22}$/);
+      expect(iban).toMatch(/^DE\d{20}$/); // DE + 2 check digits + 18 BBAN digits
       expect(iban.length).toBe(22);
     });
 

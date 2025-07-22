@@ -20,7 +20,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
         await navigator.clipboard.writeText(ibanRaw);
       } else {
         // Clipboard API not supported
-        throw new Error('Clipboard not supported in this browser.');
+        throw new Error('Clipboard copying is not supported in this browser. Please manually select and copy the IBAN.');
       }
       
       setCopyMessage('Copied!');

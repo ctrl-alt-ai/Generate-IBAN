@@ -1,52 +1,12 @@
 import { IBAN_SPECS } from './constants';
-import type { BankInfo, CharacterType } from './types';
+import type { BankInfo } from './types';
 import { CountryGeneratorFactory } from '../generators/CountryGeneratorFactory';
 import { IBANError } from '../errors/IBANErrors';
+import { generateRandomChars, calculateMod97Check } from './randomUtils';
 
-/**
- * Generates random characters of specified type
- */
-export function generateRandomChars(length: number, type: CharacterType = 'numeric'): string {
-  if (length <= 0) return '';
+// Re-export for backward compatibility
+export { generateRandomChars, calculateMod97Check };
 
-  let result = '';
-  const alphaUpper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const numeric = '0123456789';
-  const alphanumericUpper = alphaUpper + numeric;
-  let chars: string;
-  const lowerType = type?.toLowerCase();
-
-  switch (lowerType) {
-    case 'alphaupper':
-    case 'alpha':
-      chars = alphaUpper;
-      break;
-    case 'alphanumericupper':
-    case 'alphanumeric':
-    case 'c':
-      chars = alphanumericUpper;
-      break;
-    case 'numeric':
-    case 'n':
-      chars = numeric;
-      break;
-    default:
-      throw new Error(`Invalid character type: ${type}`);
-  }
-
-  if (window.crypto && window.crypto.getRandomValues) {
-    const randomValues = new Uint32Array(length);
-    window.crypto.getRandomValues(randomValues);
-
-    for (let i = 0; i < length; i++) {
-      result += chars[randomValues[i] % chars.length];
-    }
-  } else {
-    throw new Error('Random number generation not supported in this browser.');
-  }
-
-  return result;
-}
 
 /**
  * Calculates IBAN check digits using mod-97 algorithm
@@ -71,7 +31,7 @@ export function calculateIBANCheckDigits(iban: string): string | null {
 
   try {
     if (!/^\d+$/.test(numerical)) {
-      throw new Error('Non-digit chars.');
+      throw new Error('Invalid characters found in numerical string for IBAN calculation.');
     }
 
     // Handle large numbers safely without BigInt
@@ -88,29 +48,7 @@ export function calculateIBANCheckDigits(iban: string): string | null {
   }
 }
 
-/**
- * Calculates mod-97 check for national check digits
- */
-export function calculateMod97Check(numericString: string): string {
-  if (!numericString || !/^\d+$/.test(numericString)) {
-    console.warn(`Invalid input for mod-97 calculation: ${numericString}`);
-    return '00';
-  }
 
-  try {
-    // Handle large numbers safely without BigInt
-    let remainder = 0;
-    for (let i = 0; i < numericString.length; i++) {
-      remainder = (remainder * 10 + parseInt(numericString[i])) % 97;
-    }
-
-    if (remainder === 0) remainder = 97;
-    return remainder < 10 ? `0${remainder}` : `${remainder}`;
-  } catch (e) {
-    console.error('Error during mod-97 check calculation:', e);
-    return '99';
-  }
-}
 
 // Initialize the factory once
 let generatorFactory: CountryGeneratorFactory | null = null;
@@ -147,7 +85,10 @@ export function generateIBAN(country: string, bankInfo?: BankInfo | null): strin
  * Formats an IBAN with spaces every 4 characters
  */
 export function formatIBAN(iban: string): string {
-  return typeof iban === 'string' ? iban.replace(/(.{4})/g, '$1 ').trim() : '';
+  if (typeof iban !== 'string') return '';
+  // Remove existing spaces and format with spaces every 4 characters
+  const cleanIban = iban.replace(/\s/g, '');
+  return cleanIban.replace(/(.{4})/g, '$1 ').trim();
 }
 
 /**

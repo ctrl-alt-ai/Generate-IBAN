@@ -1,6 +1,6 @@
 import type { IBANSpec, BankInfo } from '../utils/types';
 import { GenerationError } from '../errors/IBANErrors';
-import { generateRandomChars, calculateMod97Check } from '../utils/ibanGenerator';
+import { generateRandomChars, calculateMod97Check } from '../utils/randomUtils';
 
 /**
  * Abstract base class for country-specific IBAN generators

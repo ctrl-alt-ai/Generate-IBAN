@@ -22,7 +22,7 @@ describe('CountryGeneratorFactory', () => {
     expect(generator).toBeDefined();
     
     const iban = generator.generateIBAN();
-    expect(iban).toMatch(/^NL\d{16}$/);
+    expect(iban).toMatch(/^NL\d{2}[A-Z]{4}\d{10}$/); // NL + 2 check digits + 4 bank letters + 10 account digits
   });
 
   test('should throw error for unsupported country', () => {

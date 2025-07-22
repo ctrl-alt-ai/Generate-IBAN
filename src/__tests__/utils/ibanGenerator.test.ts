@@ -32,7 +32,7 @@ describe('IBAN Generator Utils', () => {
       const iban = generateIBAN('DE');
       
       expect(iban).toBeDefined();
-      expect(iban).toMatch(/^DE\d{22}$/);
+      expect(iban).toMatch(/^DE\d{20}$/); // DE + 2 check digits + 18 BBAN digits
       expect(iban!.length).toBe(22);
     });
 
@@ -165,8 +165,9 @@ describe('IBAN Generator Utils', () => {
       const result1 = calculateMod97Check('0');
       expect(result1).toMatch(/^\d{2}$/);
       
+      // For input '97': 97 % 97 = 0, so check = 98 - 0 = 98
       const result2 = calculateMod97Check('97');
-      expect(result2).toBe('01');
+      expect(result2).toBe('98');
     });
 
     test('should return "00" for invalid input', () => {
@@ -192,14 +193,11 @@ describe('IBAN Generator Utils', () => {
   });
 
   describe('getSuggestedCountry', () => {
+    const originalNavigator = global.navigator;
+    
     afterEach(() => {
       // Restore original navigator
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      delete (window as any).navigator;
-      Object.defineProperty(window, 'navigator', {
-        writable: true,
-        value: navigator,
-      });
+      global.navigator = originalNavigator;
     });
 
     test('should suggest NL for Dutch language', () => {
