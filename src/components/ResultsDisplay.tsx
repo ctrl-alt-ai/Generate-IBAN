@@ -8,7 +8,7 @@ interface ResultsDisplayProps {
 
 export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country }) => {
   const [copyMessage, setCopyMessage] = useState('');
-  const [copyTimeout, setCopyTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
+  const [copyTimeout, setCopyTimeout] = useState<number | null>(null);
 
   if (results.length === 0) return null;
 
@@ -20,7 +20,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
         await navigator.clipboard.writeText(ibanRaw);
       } else {
         // Clipboard API not supported
-        throw new Error('Clipboard not supported in this browser.');
+        throw new Error('Clipboard copying is not supported in this browser. Please manually select and copy the IBAN.');
       }
       
       setCopyMessage('Copied!');

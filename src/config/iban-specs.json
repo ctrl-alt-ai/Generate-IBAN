@@ -1,0 +1,58 @@
+{
+  "NL": {
+    "length": 18,
+    "bankCodeLength": 4,
+    "accountLength": 10,
+    "bankCodeType": "alphaUpper",
+    "accountType": "numeric"
+  },
+  "DE": {
+    "length": 22,
+    "bankCodeLength": 8,
+    "accountLength": 10,
+    "bankCodeType": "numeric",
+    "accountType": "numeric"
+  },
+  "BE": {
+    "length": 16,
+    "bankCodeLength": 3,
+    "accountLength": 7,
+    "nationalCheckLength": 2,
+    "bankCodeType": "numeric",
+    "accountType": "numeric",
+    "nationalCheckType": "numeric"
+  },
+  "FR": {
+    "length": 27,
+    "bankCodeLength": 5,
+    "branchCodeLength": 5,
+    "accountLength": 11,
+    "nationalCheckLength": 2,
+    "bankCodeType": "numeric",
+    "branchCodeType": "numeric",
+    "accountType": "alphanumericUpper",
+    "nationalCheckType": "numeric"
+  },
+  "ES": {
+    "length": 24,
+    "bankCodeLength": 4,
+    "branchCodeLength": 4,
+    "nationalCheckLength": 2,
+    "accountLength": 10,
+    "bankCodeType": "numeric",
+    "branchCodeType": "numeric",
+    "nationalCheckType": "numeric",
+    "accountType": "numeric"
+  },
+  "IT": {
+    "length": 27,
+    "nationalCheckLength": 1,
+    "bankCodeLength": 5,
+    "branchCodeLength": 5,
+    "accountLength": 12,
+    "nationalCheckType": "alphaUpper",
+    "bankCodeType": "numeric",
+    "branchCodeType": "numeric",
+    "accountType": "alphanumericUpper"
+  }
+}
