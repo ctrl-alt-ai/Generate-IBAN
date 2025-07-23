@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { formatIBAN } from '../utils/ibanGenerator';
+import { ExportModal } from './ExportModal';
 import type { ToastType } from '../hooks/useToast';
 
 interface ResultsDisplayProps {
   results: string[];
   country: string;
+  bank?: string;
   onToast: (message: string, type: ToastType, duration?: number) => void;
 }
 
-export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country, onToast }) => {
+export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country, bank, onToast }) => {
+  const [showExportModal, setShowExportModal] = useState(false);
+
   if (results.length === 0) return null;
 
   const handleCopy = async (iban: string) => {
@@ -128,8 +132,26 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
           >
             Download Results (.txt)
           </button>
+          <button 
+            type="button" 
+            className="btn btn-primary"
+            onClick={() => setShowExportModal(true)}
+          >
+            Export Multiple Formats
+          </button>
         </div>
       </div>
+      
+      {/* Export Modal */}
+      {showExportModal && (
+        <ExportModal
+          ibans={results}
+          country={country}
+          bank={bank}
+          onClose={() => setShowExportModal(false)}
+          onToast={onToast}
+        />
+      )}
     </div>
   );
 };

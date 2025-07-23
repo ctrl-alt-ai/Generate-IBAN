@@ -184,6 +184,7 @@ function App() {
               <ResultsDisplay 
                 results={results}
                 country={currentCountry}
+                bank={formData.bank}
                 onToast={addToast}
               />
             </div>
