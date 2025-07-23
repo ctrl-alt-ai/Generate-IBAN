@@ -11,7 +11,7 @@ interface KeyboardShortcutConfig {
 export function useKeyboardShortcut(
   config: KeyboardShortcutConfig | string,
   callback: () => void,
-  dependencies: any[] = []
+  dependencies: React.DependencyList = []
 ) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -53,5 +53,5 @@ export function useKeyboardShortcut(
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [config, callback, ...dependencies]);
+  }, [config, callback, dependencies]);
 }

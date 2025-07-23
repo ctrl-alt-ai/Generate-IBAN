@@ -7,9 +7,20 @@ interface IBANValidatorProps {
   onToast: (message: string, type: ToastType, duration?: number) => void;
 }
 
+interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+  formatted?: string;
+  country?: string;
+  bankCode?: string;
+  accountNumber?: string;
+  checkDigits?: string;
+  bban?: string;
+}
+
 export const IBANValidator: React.FC<IBANValidatorProps> = ({ onToast }) => {
   const [inputValue, setInputValue] = useState('');
-  const [validationResult, setValidationResult] = useState<any>(null);
+  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
   const [isValidating, setIsValidating] = useState(false);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,7 +77,7 @@ export const IBANValidator: React.FC<IBANValidatorProps> = ({ onToast }) => {
       } else {
         throw new Error('Clipboard API not supported');
       }
-    } catch (error) {
+    } catch {
       onToast('Failed to copy IBAN information', 'error');
     }
   };
@@ -105,7 +116,7 @@ export const IBANValidator: React.FC<IBANValidatorProps> = ({ onToast }) => {
             {validationResult.isValid ? (
               <div className="iban-details">
                 <p><strong>Formatted IBAN:</strong> {validationResult.formatted}</p>
-                <p><strong>Country:</strong> {validationResult.country} ({COUNTRY_NAMES[validationResult.country] || 'Unknown'})</p>
+                <p><strong>Country:</strong> {validationResult.country} ({COUNTRY_NAMES[validationResult.country || ''] || 'Unknown'})</p>
                 {validationResult.bankCode && (
                   <p><strong>Bank Code:</strong> {validationResult.bankCode}</p>
                 )}

@@ -51,13 +51,20 @@ export function validateIBAN(iban: string): {
     if (!isChecksumValid) {
       errors.push('IBAN checksum is invalid');
     }
-  } catch (error) {
+  } catch {
     errors.push('Failed to validate IBAN checksum');
   }
 
   const isValid = errors.length === 0;
 
-  const result: any = {
+  const result: {
+    isValid: boolean;
+    errors: string[];
+    formatted?: string;
+    country?: string;
+    bankCode?: string;
+    accountNumber?: string;
+  } = {
     isValid,
     errors
   };
@@ -150,7 +157,13 @@ export function getIBANInfo(iban: string): {
   const bban = cleanIban.substring(4);
   
   const spec = IBAN_SPECS[countryCode];
-  const result: any = {
+  const result: {
+    country: string;
+    checkDigits: string;
+    bban: string;
+    bankCode?: string;
+    accountNumber?: string;
+  } = {
     country: countryCode,
     checkDigits,
     bban

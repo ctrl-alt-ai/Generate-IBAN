@@ -41,18 +41,18 @@ export function useFormValidation() {
     return { isValid: true, message: '' };
   }, []);
 
-  const validateField = useCallback((field: keyof FormValidationState, value: any, extra?: any) => {
+  const validateField = useCallback((field: keyof FormValidationState, value: string | number, extra?: string | number | boolean) => {
     let newState: ValidationState;
     
     switch (field) {
       case 'country':
-        newState = validateCountry(value);
+        newState = validateCountry(value as string);
         break;
       case 'quantity':
-        newState = validateQuantity(value);
+        newState = validateQuantity(value as number);
         break;
       case 'bank':
-        newState = validateBank(value, extra);
+        newState = validateBank(value as string, extra as boolean);
         break;
       default:
         newState = { isValid: true, message: '' };
@@ -73,7 +73,7 @@ export function useFormValidation() {
   }): boolean => {
     const countryValid = validateField('country', formData.country);
     const quantityValid = validateField('quantity', formData.quantity);
-    const bankValid = validateField('bank', formData.bank, false);
+    const bankValid = validateField('bank', formData.bank || '', false);
 
     return countryValid && quantityValid && bankValid;
   }, [validateField]);

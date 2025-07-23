@@ -28,7 +28,7 @@ export const IBANHistory: React.FC<IBANHistoryProps> = ({ onToast }) => {
       URL.revokeObjectURL(url);
       
       onToast('History exported successfully!', 'success');
-    } catch (error) {
+    } catch {
       onToast('Failed to export history', 'error');
     }
   };
@@ -49,7 +49,7 @@ export const IBANHistory: React.FC<IBANHistoryProps> = ({ onToast }) => {
       } else {
         throw new Error('Clipboard API not supported');
       }
-    } catch (error) {
+    } catch {
       onToast('Failed to copy IBANs', 'error');
     }
   };
