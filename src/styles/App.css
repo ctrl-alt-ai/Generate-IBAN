@@ -656,6 +656,247 @@ kbd {
   }
 }
 
+/* IBAN Validator Styles */
+.validator-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.validation-result {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+}
+
+.validation-result.valid {
+  background-color: rgba(22, 163, 74, 0.1);
+  border-color: var(--success-color);
+}
+
+.validation-result.invalid {
+  background-color: rgba(220, 38, 38, 0.1);
+  border-color: var(--error-color);
+}
+
+.validation-summary h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+}
+
+.iban-details p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.iban-details strong {
+  font-weight: 600;
+}
+
+.validation-errors h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: var(--error-color);
+}
+
+.validation-errors ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.validation-errors li {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: var(--error-color);
+}
+
+.form-input.valid {
+  border-color: var(--success-color);
+}
+
+.form-input.invalid {
+  border-color: var(--error-color);
+}
+
+/* History Styles */
+.history-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.history-entry {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: var(--card-background);
+  overflow: hidden;
+}
+
+.history-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--secondary-color);
+}
+
+.history-entry-info {
+  flex: 1;
+}
+
+.history-entry-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.history-country {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.history-bank {
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.history-quantity {
+  background: var(--primary-color);
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.history-entry-meta {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+.history-entry-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.history-entry-content {
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.history-ibans {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.history-iban {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: var(--input-background);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+}
+
+.history-iban .iban-text {
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+/* Button variations */
+.btn-small {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  min-height: auto;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-light);
+  border: 1px solid var(--border-color);
+}
+
+.btn-outline:hover,
+.btn-outline:focus {
+  background: var(--secondary-color);
+  color: var(--text-color);
+}
+
+/* Tab navigation styles */
+.tabs-container {
+  margin-bottom: 2rem;
+}
+
+.tabs-nav {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  color: var(--text-light);
+  font-size: 1rem;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-duration) var(--transition-timing);
+}
+
+.tab-button:hover {
+  color: var(--text-color);
+  background: var(--secondary-color);
+}
+
+.tab-button.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  font-weight: 600;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 600px) {
     h1 {
       font-size: 1.8rem;
@@ -708,5 +949,48 @@ kbd {
 
     .toast-message {
       font-size: 0.8rem;
+    }
+
+    /* History and validator mobile styles */
+    .history-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .history-entry-header {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    .history-entry-actions {
+      justify-content: flex-end;
+    }
+
+    .history-entry-main {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .history-iban {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+
+    .tabs-nav {
+      flex-direction: column;
+    }
+
+    .tab-button {
+      text-align: left;
+      border-bottom: none;
+      border-left: 2px solid transparent;
+    }
+
+    .tab-button.active {
+      border-left-color: var(--primary-color);
+      border-bottom-color: transparent;
     }
 }
