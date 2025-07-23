@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { formatIBAN } from '../utils/ibanGenerator';
+import type { ToastType } from '../hooks/useToast';
 
 interface ResultsDisplayProps {
   results: string[];
   country: string;
+  onToast: (message: string, type: ToastType, duration?: number) => void;
 }
 
-export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country }) => {
-  const [copyMessage, setCopyMessage] = useState('');
-  const [copyTimeout, setCopyTimeout] = useState<number | null>(null);
-
+export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country, onToast }) => {
   if (results.length === 0) return null;
 
   const handleCopy = async (iban: string) => {
@@ -20,36 +19,14 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
         await navigator.clipboard.writeText(ibanRaw);
       } else {
         // Clipboard API not supported
-        throw new Error('Clipboard copying is not supported in this browser. Please manually select and copy the IBAN.');
+        throw new Error('Clipboard copying is not supported in this browser.');
       }
       
-      setCopyMessage('Copied!');
-      
-      // Clear previous timeout
-      if (copyTimeout) {
-        clearTimeout(copyTimeout);
-      }
-      
-      // Set new timeout
-      const timeout = window.setTimeout(() => {
-        setCopyMessage('');
-      }, 3000);
-      
-      setCopyTimeout(timeout);
+      onToast('IBAN copied to clipboard!', 'success', 3000);
       
     } catch (err) {
       console.error('Copy failed:', err);
-      setCopyMessage('Copy failed');
-      
-      if (copyTimeout) {
-        clearTimeout(copyTimeout);
-      }
-      
-      const timeout = window.setTimeout(() => {
-        setCopyMessage('');
-      }, 3000);
-      
-      setCopyTimeout(timeout);
+      onToast('Copy failed. Please manually select and copy the IBAN.', 'error', 5000);
     }
   };
 
@@ -65,8 +42,11 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      
+      onToast('IBAN results downloaded successfully!', 'success');
     } catch (e) {
       console.error('Error downloading bulk IBAN results:', e);
+      onToast('Error downloading results. Please try again.', 'error');
     }
   };
 
@@ -112,11 +92,6 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
                 <CopyIcon />
               </button>
             </div>
-            {copyMessage && (
-              <p className="copy-message" role="status" aria-live="polite">
-                {copyMessage}
-              </p>
-            )}
           </div>
         </div>
       </div>
