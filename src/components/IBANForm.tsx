@@ -3,31 +3,18 @@ import { IBAN_SPECS, COUNTRY_NAMES, BANK_DATA } from '../utils/constants';
 import { getSuggestedCountry } from '../utils/ibanGenerator';
 import type { BankInfo, FormData } from '../utils/types';
 
-interface ValidationState {
-  isValid: boolean;
-  message: string;
-}
-
-interface FormValidationState {
-  country: ValidationState;
-  bank: ValidationState;
-  quantity: ValidationState;
-  general: ValidationState;
-}
-
 interface IBANFormProps {
   onGenerate: (data: FormData) => void;
-  onFormDataChange: (data: FormData) => void;
   isGenerating: boolean;
-  validationState: FormValidationState;
+  errors: {
+    country?: string;
+    bank?: string;
+    quantity?: string;
+    general?: string;
+  };
 }
 
-export const IBANForm: React.FC<IBANFormProps> = ({ 
-  onGenerate, 
-  onFormDataChange, 
-  isGenerating, 
-  validationState 
-}) => {
+export const IBANForm: React.FC<IBANFormProps> = ({ onGenerate, isGenerating, errors }) => {
   const [formData, setFormData] = useState<FormData>({
     country: getSuggestedCountry(),
     bank: '',
@@ -36,11 +23,6 @@ export const IBANForm: React.FC<IBANFormProps> = ({
   
   const [showBankSelector, setShowBankSelector] = useState(false);
   const [availableBanks, setAvailableBanks] = useState<{ [key: string]: BankInfo }>({});
-
-  // Update parent component when form data changes
-  useEffect(() => {
-    onFormDataChange(formData);
-  }, [formData, onFormDataChange]);
 
   // Update bank selector when country changes
   useEffect(() => {
@@ -99,17 +81,16 @@ export const IBANForm: React.FC<IBANFormProps> = ({
       <fieldset>
         <legend className="form-section-heading">Generator Settings</legend>
 
-        <div className={`form-group has-validation ${validationState.country.isValid ? 'is-valid' : 'is-invalid'}`}>
+        <div className="form-group">
           <label htmlFor="country">Country:</label>
           <select
             id="country"
             name="country"
-            className="form-input"
             value={formData.country}
             onChange={handleCountryChange}
             required
-            aria-describedby="country-help country-validation"
-            aria-invalid={!validationState.country.isValid}
+            aria-describedby="country-help country-error"
+            aria-invalid={errors.country ? 'true' : 'false'}
           >
             {sortedCountries.map((countryCode) => (
               <option key={countryCode} value={countryCode}>
@@ -120,22 +101,23 @@ export const IBANForm: React.FC<IBANFormProps> = ({
           <p id="country-help" className="help-text">
             Select the country for the IBAN.
           </p>
-          <p id="country-validation" className={`validation-message ${validationState.country.isValid ? 'success' : 'error'}`}>
-            {validationState.country.message}
-          </p>
+          {errors.country && (
+            <p id="country-error" className="error-message has-error" role="alert">
+              {errors.country}
+            </p>
+          )}
         </div>
 
         {showBankSelector && (
-          <div className={`form-group has-validation ${validationState.bank.isValid ? 'is-valid' : 'is-invalid'}`} id="bank-container">
+          <div className="form-group" id="bank-container">
             <label htmlFor="bank">Bank:</label>
             <select
               id="bank"
               name="bank"
-              className="form-input"
               value={formData.bank}
               onChange={handleBankChange}
-              aria-describedby="bank-help bank-validation"
-              aria-invalid={!validationState.bank.isValid}
+              aria-describedby="bank-help bank-error"
+              aria-invalid={errors.bank ? 'true' : 'false'}
             >
               {sortedBanks.map(([bic, bank]) => (
                 <option key={bic} value={bic}>
@@ -146,9 +128,11 @@ export const IBANForm: React.FC<IBANFormProps> = ({
             <p id="bank-help" className="help-text">
               Optional: Select a bank for {COUNTRY_NAMES[formData.country] || formData.country}.
             </p>
-            <p id="bank-validation" className={`validation-message ${validationState.bank.isValid ? 'success' : 'error'}`}>
-              {validationState.bank.message}
-            </p>
+            {errors.bank && (
+              <p id="bank-error" className="error-message has-error" role="alert">
+                {errors.bank}
+              </p>
+            )}
           </div>
         )}
 
@@ -161,34 +145,35 @@ export const IBANForm: React.FC<IBANFormProps> = ({
           </div>
         )}
 
-        <div className={`form-group has-validation ${validationState.quantity.isValid ? 'is-valid' : 'is-invalid'}`}>
+        <div className="form-group">
           <label htmlFor="quantity">Number of IBANs to generate:</label>
           <input
             type="number"
             id="quantity"
             name="quantity"
-            className="form-input"
             value={formData.quantity}
             min="1"
             max="100"
             onChange={handleQuantityChange}
             required
             autoComplete="off"
-            aria-describedby="quantity-help quantity-validation"
-            aria-invalid={!validationState.quantity.isValid}
+            aria-describedby="quantity-help quantity-error"
+            aria-invalid={errors.quantity ? 'true' : 'false'}
           />
           <p id="quantity-help" className="help-text">
             Enter a number between 1 and 100.
           </p>
-          <p id="quantity-validation" className={`validation-message ${validationState.quantity.isValid ? 'success' : 'error'}`}>
-            {validationState.quantity.message}
-          </p>
+          {errors.quantity && (
+            <p id="quantity-error" className="error-message has-error" role="alert">
+              {errors.quantity}
+            </p>
+          )}
         </div>
 
-        {validationState.general.message && (
+        {errors.general && (
           <div className="form-group">
-            <p className={`error-message ${validationState.general.isValid ? '' : 'has-error'}`} role="alert">
-              {validationState.general.message}
+            <p className="error-message has-error" role="alert">
+              {errors.general}
             </p>
           </div>
         )}
@@ -201,9 +186,6 @@ export const IBANForm: React.FC<IBANFormProps> = ({
           >
             {isGenerating ? 'Generating...' : 'Generate IBAN(s)'}
           </button>
-          <p className="keyboard-shortcut-hint">
-            or press <kbd>Ctrl+Enter</kbd>
-          </p>
         </div>
       </fieldset>
     </form>
