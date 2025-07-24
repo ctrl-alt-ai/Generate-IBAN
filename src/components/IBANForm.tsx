@@ -95,15 +95,14 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
     }
   }, [isFormValid, isGenerating, onGenerate, deferredFormData]);
 
-  // Memoized validation message component
+  // Memoized validation message component - only show errors and warnings
   const ValidationMessage = memo(({ validation }: { validation: ReturnType<typeof getFieldValidation> }) => {
-    if (!validation) return null;
+    if (!validation || validation.type === 'success') return null;
     
     return (
       <p className={`validation-message ${validation.type}`} role={validation.type === 'error' ? 'alert' : 'status'}>
         {validation.type === 'error' && '⚠️ '}
         {validation.type === 'warning' && '⚠️ '}
-        {validation.type === 'success' && '✓ '}
         {validation.message}
       </p>
     );
@@ -138,8 +137,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
             required
             aria-describedby="country-help country-validation"
             aria-invalid={getFieldValidation('country')?.type === 'error' ? 'true' : 'false'}
-            className={getFieldValidation('country')?.type === 'error' ? 'invalid' : 
-                      getFieldValidation('country')?.type === 'success' ? 'valid' : ''}
+            className={getFieldValidation('country')?.type === 'error' ? 'invalid' : ''}
           >
             {sortedCountries.map((countryCode) => (
               <option key={countryCode} value={countryCode}>
@@ -176,8 +174,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
               onChange={handleBankChange}
               aria-describedby="bank-help bank-validation"
               aria-invalid={getFieldValidation('bank')?.type === 'error' ? 'true' : 'false'}
-              className={getFieldValidation('bank')?.type === 'error' ? 'invalid' : 
-                        getFieldValidation('bank')?.type === 'success' ? 'valid' : ''}
+              className={getFieldValidation('bank')?.type === 'error' ? 'invalid' : ''}
             >
               {sortedBanks.map(([bic, bank]) => (
                 <option key={bic} value={bic}>
@@ -219,8 +216,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
             autoComplete="off"
             aria-describedby="quantity-help quantity-validation"
             aria-invalid={getFieldValidation('quantity')?.type === 'error' ? 'true' : 'false'}
-            className={getFieldValidation('quantity')?.type === 'error' ? 'invalid' : 
-                      getFieldValidation('quantity')?.type === 'success' ? 'valid' : ''}
+            className={getFieldValidation('quantity')?.type === 'error' ? 'invalid' : ''}
           />
           <p id="quantity-help" className="help-text">
             {t('form.quantity.help')}
