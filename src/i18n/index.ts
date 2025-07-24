@@ -1,21 +1,5 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { SUPPORTED_LANGUAGES } from '../constants/languages';
-
-// Helper function to detect browser language
-function detectBrowserLanguage(): string {
-  try {
-    const lang = navigator.language.toLowerCase();
-    const baseLang = lang.split('-')[0];
-    
-    if (SUPPORTED_LANGUAGES.includes(baseLang as typeof SUPPORTED_LANGUAGES[number])) {
-      return baseLang;
-    }
-  } catch (e) {
-    console.warn('Could not detect browser language:', e);
-  }
-  return 'en'; // Default fallback
-}
 
 // Translation resources
 const resources = {
@@ -25,12 +9,6 @@ const resources = {
       title: 'IBAN Generator',
       subtitle: 'Generate valid IBAN numbers for testing purposes',
       skipToContent: 'Skip to main content',
-      
-      // Language selector
-      languageSelector: {
-        toggle: 'Change language',
-        current: 'Current language: {{language}}'
-      },
       
       // Form labels and help text
       form: {
@@ -93,12 +71,6 @@ const resources = {
       subtitle: 'Genereer geldige IBAN-nummers voor testdoeleinden',
       skipToContent: 'Ga naar hoofdinhoud',
       
-      // Language selector
-      languageSelector: {
-        toggle: 'Taal wijzigen',
-        current: 'Huidige taal: {{language}}'
-      },
-      
       // Form labels and help text
       form: {
         legend: 'Generator Instellingen',
@@ -159,12 +131,6 @@ const resources = {
       title: 'IBAN Generator',
       subtitle: 'Gültige IBAN-Nummern für Testzwecke generieren',
       skipToContent: 'Zum Hauptinhalt springen',
-      
-      // Language selector
-      languageSelector: {
-        toggle: 'Sprache ändern',
-        current: 'Aktuelle Sprache: {{language}}'
-      },
       
       // Form labels and help text
       form: {
@@ -227,7 +193,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: detectBrowserLanguage(), // Auto-detect language
+    lng: 'en', // default language
     fallbackLng: 'en',
     debug: false,
     

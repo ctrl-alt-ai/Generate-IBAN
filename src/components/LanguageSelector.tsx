@@ -1,4 +1,4 @@
-import React, { memo, useState, useRef, useEffect } from 'react';
+import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const languages = [
@@ -8,59 +8,30 @@ const languages = [
 ];
 
 export const LanguageSelector: React.FC = memo(() => {
-  const { i18n, t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const { i18n } = useTranslation();
 
-  // Handle clicks outside to close dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  const handleLanguageChange = (languageCode: string) => {
-    i18n.changeLanguage(languageCode);
-    setIsOpen(false);
+  const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    i18n.changeLanguage(event.target.value);
   };
 
-  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
-
   return (
-    <div className="language-selector-discrete" ref={containerRef}>
-      <button
-        type="button"
-        className="language-toggle"
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label={t('languageSelector.toggle', 'Change language')}
-        aria-expanded={isOpen}
-        title={t('languageSelector.current', { name: currentLanguage.name }, `Current: ${currentLanguage.name}`)}
+    <div className="language-selector">
+      <label htmlFor="language-select" className="visually-hidden">
+        Select Language
+      </label>
+      <select
+        id="language-select"
+        value={i18n.language}
+        onChange={handleLanguageChange}
+        className="language-select"
+        aria-label="Select Language"
       >
-        🌐
-      </button>
-      
-      {isOpen && (
-        <div className="language-dropdown">
-          {languages.map((lang) => (
-            <button
-              key={lang.code}
-              type="button"
-              className={`language-option ${lang.code === i18n.language ? 'active' : ''}`}
-              onClick={() => handleLanguageChange(lang.code)}
-            >
-              <span className="flag">{lang.flag}</span>
-              <span className="name">{lang.name}</span>
-            </button>
-          ))}
-        </div>
-      )}
+        {languages.map((lang) => (
+          <option key={lang.code} value={lang.code}>
+            {lang.flag} {lang.name}
+          </option>
+        ))}
+      </select>
     </div>
   );
 });
