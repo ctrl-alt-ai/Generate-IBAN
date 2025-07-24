@@ -111,6 +111,44 @@ header {
     margin-bottom: 2.5rem;
 }
 
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.title-section {
+    flex: 1;
+    text-align: left;
+}
+
+.language-selector {
+    flex-shrink: 0;
+}
+
+.language-select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--input-background);
+    color: var(--text-color);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: border-color var(--transition-duration) var(--transition-timing);
+}
+
+.language-select:hover {
+    border-color: var(--primary-color);
+}
+
+.language-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--focus-ring-color);
+}
+
 h1 {
     font-size: 2.25rem;
     font-weight: 700;
@@ -541,4 +579,197 @@ textarea[aria-invalid="true"]:focus {
       margin-top: 0.5rem;
       align-self: flex-end;
     }
+    
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .title-section {
+        text-align: center;
+    }
+}
+
+/* Skeleton Loading Animation */
+.skeleton-container {
+  padding: 1rem 0;
+}
+
+.skeleton-line {
+  height: 1.5rem;
+  background: linear-gradient(90deg, 
+    var(--border-color) 25%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    var(--border-color) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--border-radius);
+  margin-bottom: 0.75rem;
+  animation: skeleton-shimmer 1.5s infinite ease-in-out;
+}
+
+.skeleton-line:last-child {
+  margin-bottom: 0;
+  width: 75%; /* Make last line shorter for realism */
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-line {
+    animation: none;
+    background: var(--border-color);
+  }
+}
+
+/* Enhanced Form Validation Styles */
+.form-group.has-validation {
+  position: relative;
+}
+
+.validation-message {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all var(--transition-duration) var(--transition-timing);
+}
+
+.validation-message.success {
+  color: var(--success-color);
+}
+
+.validation-message.error {
+  color: var(--error-color);
+}
+
+.validation-message.warning {
+  color: #f59e0b;
+}
+
+.form-field-enhanced {
+  position: relative;
+}
+
+.form-field-enhanced input,
+.form-field-enhanced select {
+  transition: border-color var(--transition-duration) var(--transition-timing),
+              box-shadow var(--transition-duration) var(--transition-timing);
+}
+
+.form-field-enhanced input:focus,
+.form-field-enhanced select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--focus-ring-color);
+}
+
+.form-field-enhanced input.valid,
+.form-field-enhanced select.valid {
+  border-color: var(--success-color);
+}
+
+.form-field-enhanced input.invalid,
+.form-field-enhanced select.invalid {
+  border-color: var(--error-color);
+}
+
+/* Loading state enhancements */
+.btn.loading {
+  position: relative;
+  color: transparent;
+  cursor: not-allowed;
+}
+
+.btn.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+  border: 2px solid var(--button-text);
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: btn-loading-spin 1s ease-in-out infinite;
+}
+
+@keyframes btn-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error Boundary Styles */
+.error-boundary {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: var(--background-color);
+}
+
+.error-boundary-content {
+  max-width: 500px;
+  text-align: center;
+  background-color: var(--card-background);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+}
+
+.error-boundary-content h2 {
+  color: var(--error-color);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.error-boundary-content p {
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.error-details {
+  text-align: left;
+  margin: 1.5rem 0;
+  background-color: var(--secondary-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.error-details summary {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  background-color: var(--border-color);
+  font-weight: 500;
+  border: none;
+  outline: none;
+}
+
+.error-details summary:hover {
+  background-color: var(--text-light);
+  color: var(--card-background);
+}
+
+.error-details pre {
+  padding: 1rem;
+  font-size: 0.875rem;
+  color: var(--error-color);
+  white-space: pre-wrap;
+  word-break: break-word;
+  background-color: var(--input-background);
+  margin: 0;
+  border-top: 1px solid var(--border-color);
 }
