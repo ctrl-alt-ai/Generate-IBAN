@@ -188,31 +188,12 @@ const resources = {
   }
 };
 
-// Detect browser language
-const getBrowserLanguage = (): string => {
-  try {
-    // Get browser language
-    const browserLang = navigator.language || navigator.languages?.[0] || 'en'; // Use robust fallback logic
-    const baseLang = browserLang.split('-')[0];
-    
-    // Check if we support the detected language
-    if (resources[baseLang as keyof typeof resources]) {
-      return baseLang;
-    }
-  } catch (e) {
-    console.warn('Could not detect browser language:', e);
-  }
-  
-  // Default to English if detection fails
-  return 'en';
-};
-
 // Initialize i18n
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: getBrowserLanguage(), // Use browser language detection
+    lng: 'en', // default language
     fallbackLng: 'en',
     debug: false,
     
