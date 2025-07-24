@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from './useDebounce';
 import type { FormData } from '../utils/types';
@@ -23,7 +23,7 @@ export function useFormValidation(formData: FormData, validationDelay = 300) {
   // Debounce form data changes to avoid excessive validation
   const debouncedFormData = useDebounce(formData, validationDelay);
 
-  const validateQuantity = (quantity: number): ValidationError | null => {
+  const validateQuantity = useCallback((quantity: number): ValidationError | null => {
     if (isNaN(quantity)) {
       return { message: t('form.quantity.validNumber'), type: 'error' };
     }
@@ -37,22 +37,22 @@ export function useFormValidation(formData: FormData, validationDelay = 300) {
       return { message: t('form.quantity.largeQuantity'), type: 'warning' };
     }
     return { message: t('form.quantity.willGenerate', { count: quantity }), type: 'success' };
-  };
+  }, [t]);
 
-  const validateCountry = (country: string): ValidationError | null => {
+  const validateCountry = useCallback((country: string): ValidationError | null => {
     if (!country) {
       return { message: t('errors.selectCountry'), type: 'error' };
     }
     return { message: t('form.country.selected'), type: 'success' };
-  };
+  }, [t]);
 
-  const validateBank = (bank: string, _country: string): ValidationError | null => {
+  const validateBank = useCallback((bank: string): ValidationError | null => {
     // Bank is optional, so no error if empty
     if (!bank) {
       return { message: t('form.bank.randomCodeUsed'), type: 'warning' };
     }
     return { message: t('form.bank.specificSelected'), type: 'success' };
-  };
+  }, [t]);
 
   useEffect(() => {
     setIsValidating(true);
@@ -62,11 +62,11 @@ export function useFormValidation(formData: FormData, validationDelay = 300) {
     // Validate each field
     results.country = validateCountry(debouncedFormData.country);
     results.quantity = validateQuantity(debouncedFormData.quantity);
-    results.bank = validateBank(debouncedFormData.bank || '', debouncedFormData.country);
+    results.bank = validateBank(debouncedFormData.bank || '');
     
     setValidationResults(results);
     setIsValidating(false);
-  }, [debouncedFormData]);
+  }, [debouncedFormData, validateCountry, validateQuantity, validateBank]);
 
   const isFormValid = () => {
     return Object.values(validationResults).every(
