@@ -61,10 +61,9 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   }, [formData.country, loadBanksForCountry]);
 
   const handleCountryChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newCountry = event.target.value;
     setFormData(prev => ({
       ...prev,
-      country: newCountry,
+      country: event.target.value,
     }));
   }, []);
 
