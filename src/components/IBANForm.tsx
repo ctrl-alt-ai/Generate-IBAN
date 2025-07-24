@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useDeferredValue, startTransition, memo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { IBAN_SPECS, COUNTRY_NAMES, BANK_DATA } from '../utils/constants';
 import { getSuggestedCountry } from '../utils/ibanGenerator';
 import { useFormValidation } from '../hooks/useFormValidation';
@@ -17,6 +18,7 @@ interface IBANFormProps {
 }
 
 export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGenerating, errors }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<FormData>({
     country: getSuggestedCountry(),
     bank: '',
@@ -124,10 +126,10 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   return (
     <form id="iban-form" onSubmit={handleSubmit} noValidate>
       <fieldset>
-        <legend className="form-section-heading">Generator Settings</legend>
+        <legend className="form-section-heading">{t('form.legend')}</legend>
 
         <div className="form-group has-validation form-field-enhanced">
-          <label htmlFor="country">Country:</label>
+          <label htmlFor="country">{t('form.country.label')}</label>
           <select
             id="country"
             name="country"
@@ -146,7 +148,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
             ))}
           </select>
           <p id="country-help" className="help-text">
-            Select the country for the IBAN.
+            {t('form.country.help')}
           </p>
           <div id="country-validation">
             <ValidationMessage validation={getFieldValidation('country')} />
@@ -160,13 +162,13 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
 
         {isBanksLoading ? (
           <div className="form-group">
-            <label>Bank:</label>
+            <label>{t('form.bank.label')}</label>
             <SkeletonLoader rows={1} />
-            <p className="help-text">Loading available banks...</p>
+            <p className="help-text">{t('form.bank.loading')}</p>
           </div>
         ) : showBankSelector ? (
           <div className="form-group has-validation form-field-enhanced" id="bank-container">
-            <label htmlFor="bank">Bank:</label>
+            <label htmlFor="bank">{t('form.bank.label')}</label>
             <select
               id="bank"
               name="bank"
@@ -184,7 +186,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
               ))}
             </select>
             <p id="bank-help" className="help-text">
-              Optional: Select a bank for {COUNTRY_NAMES[formData.country] || formData.country}.
+              {t('form.bank.help', { country: COUNTRY_NAMES[formData.country] || formData.country })}
             </p>
             <div id="bank-validation">
               <ValidationMessage validation={getFieldValidation('bank')} />
@@ -198,14 +200,13 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
         ) : (
           <div className="form-group">
             <p className="help-text">
-              No specific banks available for {COUNTRY_NAMES[formData.country] || formData.country}. 
-              A random valid bank code will be used.
+              {t('form.bank.noSpecificBanks', { country: COUNTRY_NAMES[formData.country] || formData.country })}
             </p>
           </div>
         )}
 
         <div className="form-group has-validation form-field-enhanced">
-          <label htmlFor="quantity">Number of IBANs to generate:</label>
+          <label htmlFor="quantity">{t('form.quantity.label')}</label>
           <input
             type="number"
             id="quantity"
@@ -222,7 +223,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
                       getFieldValidation('quantity')?.type === 'success' ? 'valid' : ''}
           />
           <p id="quantity-help" className="help-text">
-            Enter a number between 1 and 100.
+            {t('form.quantity.help')}
           </p>
           <div id="quantity-validation">
             <ValidationMessage validation={getFieldValidation('quantity')} />
@@ -249,11 +250,11 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
             disabled={isGenerating || !isFormValid}
             aria-describedby="submit-help"
           >
-            {isGenerating ? 'Generating...' : 'Generate IBAN(s)'}
+            {isGenerating ? t('form.submit.generating') : t('form.submit.generate')}
           </button>
           {!isFormValid && !isGenerating && (
             <p id="submit-help" className="help-text" role="status">
-              Please fix the form errors above before submitting.
+              {t('form.submit.fixErrors')}
             </p>
           )}
         </div>

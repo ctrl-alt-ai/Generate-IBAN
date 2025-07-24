@@ -1,12 +1,15 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { IBANForm } from './components/IBANForm';
 import { ResultsDisplay } from './components/ResultsDisplay';
+import { LanguageSelector } from './components/LanguageSelector';
 import { generateIBAN } from './utils/ibanGenerator';
 import { BANK_DATA, COUNTRY_NAMES } from './utils/constants';
 import type { FormData } from './utils/types';
 import './styles/App.css';
 
 function App() {
+  const { t } = useTranslation();
   const [results, setResults] = useState<string[]>([]);
   const [currentCountry, setCurrentCountry] = useState<string>('NL');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -21,11 +24,11 @@ function App() {
     const newErrors: typeof errors = {};
 
     if (!data.country) {
-      newErrors.country = 'Please select a valid country.';
+      newErrors.country = t('errors.selectCountry');
     }
 
     if (isNaN(data.quantity) || data.quantity < 1 || data.quantity > 100) {
-      newErrors.quantity = 'Please enter a number between 1 and 100.';
+      newErrors.quantity = t('errors.invalidQuantity');
     }
 
     setErrors(newErrors);
@@ -68,18 +71,18 @@ function App() {
         
         if (failures > 0 && data.quantity > 1) {
           setErrors({
-            general: `Note: ${failures} out of ${data.quantity} IBANs could not be generated.`
+            general: t('errors.partialFailure', { failures, total: data.quantity })
           });
         }
       } else {
         setErrors({
-          general: `Failed to generate any IBANs for ${COUNTRY_NAMES[data.country] || data.country}.`
+          general: t('errors.generateFailed', { country: COUNTRY_NAMES[data.country] || data.country })
         });
       }
     } catch (error) {
       console.error('Error generating IBANs:', error);
       setErrors({
-        general: 'An unexpected error occurred while generating IBANs. Please try again.'
+        general: t('errors.unexpectedError')
       });
     } finally {
       setIsGenerating(false);
@@ -89,20 +92,24 @@ function App() {
   return (
     <>
       {/* Skip Navigation Link for accessibility */}
-      <a href="#main-content" className="skip-link">Skip to main content</a>
+      <a href="#main-content" className="skip-link">{t('skipToContent')}</a>
 
       <main id="main-content">
         <div className="container">
           <header role="banner">
-            <h1>IBAN Generator</h1>
-            <p className="subtitle">Generate valid IBAN numbers for testing purposes</p>
+            <div className="header-content">
+              <div className="title-section">
+                <h1>{t('title')}</h1>
+                <p className="subtitle">{t('subtitle')}</p>
+              </div>
+              <LanguageSelector />
+            </div>
           </header>
 
           <div className="card">
             <noscript>
               <p className="error-message has-error">
-                JavaScript is required for this tool to function. Please enable JavaScript in your
-                browser.
+                {t('errors.jsRequired')}
               </p>
             </noscript>
 

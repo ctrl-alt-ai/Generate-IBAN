@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDebounce } from './useDebounce';
 import type { FormData } from '../utils/types';
 
@@ -15,6 +16,7 @@ interface ValidationResult {
  * Enhanced form validation hook with real-time validation and debouncing
  */
 export function useFormValidation(formData: FormData, validationDelay = 300) {
+  const { t } = useTranslation();
   const [validationResults, setValidationResults] = useState<ValidationResult>({});
   const [isValidating, setIsValidating] = useState(false);
   
@@ -23,33 +25,33 @@ export function useFormValidation(formData: FormData, validationDelay = 300) {
 
   const validateQuantity = (quantity: number): ValidationError | null => {
     if (isNaN(quantity)) {
-      return { message: 'Please enter a valid number', type: 'error' };
+      return { message: t('form.quantity.validNumber'), type: 'error' };
     }
     if (quantity < 1) {
-      return { message: 'Minimum quantity is 1', type: 'error' };
+      return { message: t('form.quantity.minimum'), type: 'error' };
     }
     if (quantity > 100) {
-      return { message: 'Maximum quantity is 100', type: 'error' };
+      return { message: t('form.quantity.maximum'), type: 'error' };
     }
     if (quantity > 50) {
-      return { message: 'Large quantities may take longer to generate', type: 'warning' };
+      return { message: t('form.quantity.largeQuantity'), type: 'warning' };
     }
-    return { message: `Will generate ${quantity} IBAN${quantity > 1 ? 's' : ''}`, type: 'success' };
+    return { message: t('form.quantity.willGenerate', { count: quantity }), type: 'success' };
   };
 
   const validateCountry = (country: string): ValidationError | null => {
     if (!country) {
-      return { message: 'Please select a country', type: 'error' };
+      return { message: t('errors.selectCountry'), type: 'error' };
     }
-    return { message: 'Country selected', type: 'success' };
+    return { message: t('form.country.selected'), type: 'success' };
   };
 
   const validateBank = (bank: string, _country: string): ValidationError | null => {
     // Bank is optional, so no error if empty
     if (!bank) {
-      return { message: 'Random bank code will be used', type: 'warning' };
+      return { message: t('form.bank.randomCodeUsed'), type: 'warning' };
     }
-    return { message: 'Specific bank selected', type: 'success' };
+    return { message: t('form.bank.specificSelected'), type: 'success' };
   };
 
   useEffect(() => {
