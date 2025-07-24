@@ -41,7 +41,7 @@ export const LanguageSelector: React.FC = memo(() => {
         onClick={() => setIsOpen(!isOpen)}
         aria-label={t('languageSelector.toggle', 'Change language')}
         aria-expanded={isOpen}
-        title={t('languageSelector.current', `Current: ${currentLanguage.name}`)}
+        title={t('languageSelector.current', { name: currentLanguage.name }, `Current: ${currentLanguage.name}`)}
       >
         🌐
       </button>

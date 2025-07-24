@@ -3,6 +3,7 @@ import type { BankInfo } from './types';
 import { CountryGeneratorFactory } from '../generators/CountryGeneratorFactory';
 import { IBANError } from '../errors/IBANErrors';
 import { generateRandomChars, calculateMod97Check } from './randomUtils';
+import { SUPPORTED_LANGUAGES } from '../constants/languages';
 
 // Re-export for backward compatibility
 export { generateRandomChars, calculateMod97Check };
@@ -99,10 +100,7 @@ export function getSuggestedLanguage(): string {
     const lang = navigator.language.toLowerCase();
     const baseLang = lang.split('-')[0];
     
-    // Supported languages mapping
-    const supportedLanguages = ['en', 'nl', 'de'];
-    
-    if (supportedLanguages.includes(baseLang)) {
+    if (SUPPORTED_LANGUAGES.includes(baseLang as typeof SUPPORTED_LANGUAGES[number])) {
       return baseLang;
     }
   } catch (e) {

@@ -1,5 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { SUPPORTED_LANGUAGES } from '../constants/languages';
 
 // Helper function to detect browser language
 function detectBrowserLanguage(): string {
@@ -7,10 +8,7 @@ function detectBrowserLanguage(): string {
     const lang = navigator.language.toLowerCase();
     const baseLang = lang.split('-')[0];
     
-    // Supported languages
-    const supportedLanguages = ['en', 'nl', 'de'];
-    
-    if (supportedLanguages.includes(baseLang)) {
+    if (SUPPORTED_LANGUAGES.includes(baseLang as typeof SUPPORTED_LANGUAGES[number])) {
       return baseLang;
     }
   } catch (e) {
