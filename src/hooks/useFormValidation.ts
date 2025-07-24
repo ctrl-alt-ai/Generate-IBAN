@@ -49,7 +49,7 @@ export function useFormValidation(formData: FormData, validationDelay = 300) {
   }, [t]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const validateBank = useCallback((bank: string): ValidationError | null => {
+  const validateBank = useCallback((_bank: string): ValidationError | null => {
     // Bank is optional, so no validation needed - clean interface
     // Parameter kept for consistency and future extensibility
     return null;
@@ -63,7 +63,7 @@ export function useFormValidation(formData: FormData, validationDelay = 300) {
     // Validate each field
     results.country = validateCountry(debouncedFormData.country);
     results.quantity = validateQuantity(debouncedFormData.quantity);
-    results.bank = validateBank(debouncedFormData.bank);
+    results.bank = validateBank(debouncedFormData.bank || '');
     
     setValidationResults(results);
     setIsValidating(false);
