@@ -192,7 +192,7 @@ const resources = {
 const getBrowserLanguage = (): string => {
   try {
     // Get browser language
-    const browserLang = navigator.language || 'en'; // Fallback to 'en' if navigator.language is undefined
+    const browserLang = navigator.language || navigator.languages?.[0] || 'en'; // Use robust fallback logic
     const baseLang = browserLang.split('-')[0];
     
     // Check if we support the detected language
