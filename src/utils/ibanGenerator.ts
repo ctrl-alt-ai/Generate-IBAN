@@ -3,6 +3,7 @@ import type { BankInfo } from './types';
 import { CountryGeneratorFactory } from '../generators/CountryGeneratorFactory';
 import { IBANError } from '../errors/IBANErrors';
 import { generateRandomChars, calculateMod97Check } from './randomUtils';
+import { SUPPORTED_LANGUAGES } from '../constants/languages';
 
 // Re-export for backward compatibility
 export { generateRandomChars, calculateMod97Check };
@@ -92,23 +93,60 @@ export function formatIBAN(iban: string): string {
 }
 
 /**
- * Gets the suggested country based on browser language
+ * Gets the suggested language based on browser settings
+ */
+export function getSuggestedLanguage(): string {
+  try {
+    const lang = navigator.language.toLowerCase();
+    const baseLang = lang.split('-')[0];
+    
+    if (SUPPORTED_LANGUAGES.includes(baseLang as typeof SUPPORTED_LANGUAGES[number])) {
+      return baseLang;
+    }
+  } catch (e) {
+    console.warn('Could not access navigator.language:', e);
+  }
+  return 'en'; // Default fallback
+}
+
+/**
+ * Gets the suggested country based on browser language and locale
  */
 export function getSuggestedCountry(): string {
   try {
     const lang = navigator.language.toLowerCase();
-    const baseLang = lang.split('-')[0];
-    if (baseLang === 'nl' && IBAN_SPECS['NL']) return 'NL';
-    if (baseLang === 'de' && IBAN_SPECS['DE']) return 'DE';
-    if (baseLang === 'fr') {
-      if ((lang.includes('be') || lang.includes('bru')) && IBAN_SPECS['BE']) return 'BE';
-      if (IBAN_SPECS['FR']) return 'FR';
-      if (IBAN_SPECS['BE']) return 'BE';
+    const parts = lang.split('-');
+    const baseLang = parts[0];
+    const country = parts[1];
+    
+    // First try exact country match from locale (e.g., nl-NL, de-DE)
+    if (country) {
+      const countryUpper = country.toUpperCase();
+      if (IBAN_SPECS[countryUpper]) {
+        return countryUpper;
+      }
     }
-    if (baseLang === 'es' && IBAN_SPECS['ES']) return 'ES';
-    if (baseLang === 'it' && IBAN_SPECS['IT']) return 'IT';
+    
+    // Smart language-to-country mapping
+    const languageMapping: { [key: string]: string } = {
+      'nl': 'NL',  // Dutch -> Netherlands
+      'de': 'DE',  // German -> Germany  
+      'fr': 'FR',  // French -> France
+      'es': 'ES',  // Spanish -> Spain
+      'it': 'IT',  // Italian -> Italy
+      'en': 'NL'   // Default English to Netherlands for this tool
+    };
+    
+    if (baseLang in languageMapping && IBAN_SPECS[languageMapping[baseLang]]) {
+      return languageMapping[baseLang];
+    }
+    
+    // Special handling for French-speaking Belgium
+    if (baseLang === 'fr' && (lang.includes('be') || lang.includes('bru')) && IBAN_SPECS['BE']) {
+      return 'BE';
+    }
   } catch (e) {
     console.warn('Could not access navigator.language:', e);
   }
-  return 'NL';
+  return 'NL'; // Default fallback
 }
