@@ -124,82 +124,29 @@ header {
     text-align: left;
 }
 
-/* Discrete Language Selector */
-.language-selector-discrete {
-    position: relative;
+.language-selector {
     flex-shrink: 0;
 }
 
-.language-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
+.language-select {
+    padding: 0.5rem 0.75rem;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     background-color: var(--input-background);
     color: var(--text-color);
-    font-size: 1.2rem;
+    font-size: 0.875rem;
     cursor: pointer;
-    transition: all var(--transition-duration) var(--transition-timing);
+    transition: border-color var(--transition-duration) var(--transition-timing);
 }
 
-.language-toggle:hover {
+.language-select:hover {
     border-color: var(--primary-color);
-    background-color: var(--secondary-color);
 }
 
-.language-toggle:focus {
+.language-select:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px var(--focus-ring-color);
-}
-
-.language-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: 0.5rem;
-    background-color: var(--card-background);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    box-shadow: var(--card-shadow);
-    min-width: 140px;
-    z-index: 1000;
-}
-
-.language-option {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: none;
-    background: none;
-    color: var(--text-color);
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: background-color var(--transition-duration) var(--transition-timing);
-    text-align: left;
-}
-
-.language-option:hover {
-    background-color: var(--secondary-color);
-}
-
-.language-option.active {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-.language-option .flag {
-    font-size: 1rem;
-    flex-shrink: 0;
-}
-
-.language-option .name {
-    flex: 1;
 }
 
 h1 {
@@ -372,8 +319,8 @@ textarea[aria-invalid="true"]:focus {
 .error-message {
     font-size: 0.875rem;
     color: var(--error-color);
-    margin-top: 0.25rem;
-    font-weight: 400;
+    margin-top: 0.5rem;
+    font-weight: 500;
     display: block;
     padding: 0;
     border: none;
@@ -382,12 +329,19 @@ textarea[aria-invalid="true"]:focus {
     max-height: 0;
     overflow: hidden;
     transition: opacity var(--transition-duration) var(--transition-timing),
-                max-height var(--transition-duration) var(--transition-timing);
+                max-height var(--transition-duration) var(--transition-timing),
+                padding var(--transition-duration) var(--transition-timing),
+                margin-bottom var(--transition-duration) var(--transition-timing);
 }
 
 .error-message.has-error {
+    margin-bottom: 1rem;
+    background-color: rgba(220, 38, 38, 0.05);
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    border-radius: var(--border-radius);
     opacity: 1;
-    max-height: 3em;
+    max-height: 10em;
 }
 
 .button-group {

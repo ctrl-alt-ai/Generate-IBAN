@@ -36,24 +36,23 @@ export function useFormValidation(formData: FormData, validationDelay = 300) {
     if (quantity > 50) {
       return { message: t('form.quantity.largeQuantity'), type: 'warning' };
     }
-    // Remove success message - only show warnings and errors
-    return null;
+    return { message: t('form.quantity.willGenerate', { count: quantity }), type: 'success' };
   }, [t]);
 
   const validateCountry = useCallback((country: string): ValidationError | null => {
     if (!country) {
       return { message: t('errors.selectCountry'), type: 'error' };
     }
-    // Remove success message - only show errors
-    return null;
+    return { message: t('form.country.selected'), type: 'success' };
   }, [t]);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const validateBank = useCallback((bank: string): ValidationError | null => {
-    // Bank is optional, so no validation needed - clean interface
-    // Parameter kept for consistency and future extensibility
-    return null;
-  }, []);
+    // Bank is optional, so no error if empty
+    if (!bank) {
+      return { message: t('form.bank.randomCodeUsed'), type: 'warning' };
+    }
+    return { message: t('form.bank.specificSelected'), type: 'success' };
+  }, [t]);
 
   useEffect(() => {
     setIsValidating(true);
@@ -63,7 +62,7 @@ export function useFormValidation(formData: FormData, validationDelay = 300) {
     // Validate each field
     results.country = validateCountry(debouncedFormData.country);
     results.quantity = validateQuantity(debouncedFormData.quantity);
-    results.bank = validateBank(debouncedFormData.bank);
+    results.bank = validateBank(debouncedFormData.bank || '');
     
     setValidationResults(results);
     setIsValidating(false);
