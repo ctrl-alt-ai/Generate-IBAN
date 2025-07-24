@@ -33,19 +33,30 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   const deferredFormData = useDeferredValue(formData);
   const { isFormValid, getFieldValidation } = useFormValidation(deferredFormData);
 
-  // Memoized bank loading function
-  const loadBanksForCountry = useCallback((country: string) => {
+  // Update bank selector when country changes
+  useEffect(() => {
+    const banksForCountry = BANK_DATA[formData.country];
     setIsBanksLoading(true);
     
-    // Simulate async bank loading (in a real app, this might be an API call)
     startTransition(() => {
-      const banksForCountry = BANK_DATA[country];
       if (banksForCountry && Object.keys(banksForCountry).length > 0) {
         setAvailableBanks(banksForCountry);
         setShowBankSelector(true);
-        // Set first bank as default
-        const firstBankKey = Object.keys(banksForCountry)[0];
-        setFormData(prev => ({ ...prev, bank: firstBankKey }));
+        
+        // Only set first bank as default if no bank is currently selected or if the current bank is not available for this country
+        setFormData(prev => {
+          const currentBank = prev.bank;
+          const isCurrentBankAvailable = currentBank && banksForCountry[currentBank];
+          
+          if (!currentBank || !isCurrentBankAvailable) {
+            // Set first bank as default
+            const firstBankKey = Object.keys(banksForCountry)[0];
+            return { ...prev, bank: firstBankKey };
+          }
+          
+          // Keep the current bank selection
+          return prev;
+        });
       } else {
         setAvailableBanks({});
         setShowBankSelector(false);
@@ -53,12 +64,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
       }
       setIsBanksLoading(false);
     });
-  }, []);
-
-  // Update bank selector when country changes
-  useEffect(() => {
-    loadBanksForCountry(formData.country);
-  }, [formData.country, loadBanksForCountry]);
+  }, [formData.country]);
 
   const handleCountryChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
     startTransition(() => {
@@ -70,12 +76,10 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   }, []);
 
   const handleBankChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-    startTransition(() => {
-      setFormData(prev => ({
-        ...prev,
-        bank: event.target.value,
-      }));
-    });
+    setFormData(prev => ({
+      ...prev,
+      bank: event.target.value,
+    }));
   }, []);
 
   const handleQuantityChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
