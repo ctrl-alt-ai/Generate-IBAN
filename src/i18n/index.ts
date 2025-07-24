@@ -192,7 +192,7 @@ const resources = {
 const getBrowserLanguage = (): string => {
   try {
     // Get browser language
-    const browserLang = navigator.language || (navigator as any).userLanguage;
+    const browserLang = navigator.language || (navigator as unknown as { userLanguage: string }).userLanguage;
     const baseLang = browserLang.split('-')[0];
     
     // Check if we support the detected language
