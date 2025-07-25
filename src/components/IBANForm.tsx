@@ -219,11 +219,6 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
               {getFieldValidation('quantity')?.message}
             </p>
           )}
-          {errors.quantity && (
-            <p className="error-message has-error" role="alert">
-              {errors.quantity}
-            </p>
-          )}
         </div>
 
         {errors.general && (
