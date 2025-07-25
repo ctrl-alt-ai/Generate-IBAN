@@ -111,7 +111,7 @@ const resources = {
         heading: 'Gegenereerde IBANs ({{count}})',
         helpText: 'Gegenereerde IBANs, één per regel.',
         download: 'Download Resultaten (.txt)',
-        copySuccess: 'Gekopieerd naar klembord!',
+        copySuccess: 'Gekopieerd!',
         copyButton: 'Kopieer IBAN'
       },
       

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { formatIBAN } from '../utils/ibanGenerator';
 
 interface ResultsDisplayProps {
@@ -7,6 +8,7 @@ interface ResultsDisplayProps {
 }
 
 export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country }) => {
+  const { t } = useTranslation();
   const [copyMessage, setCopyMessage] = useState('');
   const [copyTimeout, setCopyTimeout] = useState<number | null>(null);
 
@@ -23,7 +25,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
         throw new Error('Clipboard copying is not supported in this browser. Please manually select and copy the IBAN.');
       }
       
-      setCopyMessage('Copied!');
+      setCopyMessage(t('results.copySuccess'));
       
       // Clear previous timeout
       if (copyTimeout) {
@@ -93,7 +95,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
     // Single IBAN result
     return (
       <div className="result-section" role="region" aria-labelledby="result-heading">
-        <h2 id="result-heading" className="form-section-heading">Generated Results</h2>
+        <h2 id="result-heading" className="form-section-heading">{t('results.title')}</h2>
         
         <div id="single-result-container">
           <h3>Generated IBAN</h3>
@@ -105,8 +107,8 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
               <button
                 type="button"
                 className="copy-btn"
-                title="Copy to clipboard"
-                aria-label="Copy IBAN to clipboard"
+                title={t('results.copyButton')}
+                aria-label={t('results.copyButton')}
                 onClick={() => handleCopy(results[0])}
               >
                 <CopyIcon />
@@ -126,10 +128,10 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
   // Multiple IBAN results
   return (
     <div className="result-section" role="region" aria-labelledby="result-heading">
-      <h2 id="result-heading" className="form-section-heading">Generated Results</h2>
+      <h2 id="result-heading" className="form-section-heading">{t('results.title')}</h2>
       
       <div className="bulk-result-container">
-        <h3>Generated IBANs ({results.length})</h3>
+        <h3>{t('results.heading', { count: results.length })}</h3>
         <div className="form-group">
           <label htmlFor="bulk-ibans">Results:</label>
           <textarea
@@ -142,7 +144,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
             aria-label="Generated IBANs"
           />
           <p id="bulk-ibans-help" className="help-text">
-            Generated IBANs, one per line.
+            {t('results.helpText')}
           </p>
         </div>
         <div className="form-group button-group">
@@ -151,7 +153,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
             className="btn btn-secondary download-bulk"
             onClick={handleDownload}
           >
-            Download Results (.txt)
+            {t('results.download')}
           </button>
         </div>
       </div>

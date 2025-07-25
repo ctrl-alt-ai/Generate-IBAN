@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useDeferredValue, startTransition, memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IBAN_SPECS, COUNTRY_NAMES, BANK_DATA } from '../utils/constants';
+import { COUNTRY_NAMES, BANK_DATA } from '../utils/constants';
 import { getSuggestedCountry } from '../utils/ibanGenerator';
 import { useFormValidation } from '../hooks/useFormValidation';
 import { SkeletonLoader } from './SkeletonLoader';
+import { CountryGeneratorFactory } from '../generators/CountryGeneratorFactory';
 import type { BankInfo, FormData } from '../utils/types';
 
 interface IBANFormProps {
@@ -101,11 +102,12 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
 
 
   // Memoized sorted countries to prevent unnecessary re-renders
-  const sortedCountries = React.useMemo(() => 
-    Object.keys(IBAN_SPECS).sort((a, b) =>
+  const sortedCountries = React.useMemo(() => {
+    const factory = new CountryGeneratorFactory();
+    return factory.getAvailableCountries().sort((a, b) =>
       (COUNTRY_NAMES[a] || a).localeCompare(COUNTRY_NAMES[b] || b)
-    ), []
-  );
+    );
+  }, []);
 
   // Memoized sorted banks
   const sortedBanks = React.useMemo(() => 
@@ -210,6 +212,13 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
           <p id="quantity-help" className="help-text">
             {t('form.quantity.help')}
           </p>
+          {getFieldValidation('quantity')?.type === 'error' && (
+            <p className={`error-message has-error ${
+              deferredFormData.quantity > 100 ? 'critical' : ''
+            }`} role="alert">
+              {getFieldValidation('quantity')?.message}
+            </p>
+          )}
           {errors.quantity && (
             <p className="error-message has-error" role="alert">
               {errors.quantity}

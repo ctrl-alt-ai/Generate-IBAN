@@ -344,6 +344,14 @@ textarea[aria-invalid="true"]:focus {
     max-height: 10em;
 }
 
+/* Enhanced styling for critical validation errors (e.g., quantity > 100) */
+.error-message.has-error.critical {
+    background-color: rgba(220, 38, 38, 0.1);
+    border: 2px solid var(--error-color);
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15);
+}
+
 .button-group {
     display: flex;
     gap: 1rem;
