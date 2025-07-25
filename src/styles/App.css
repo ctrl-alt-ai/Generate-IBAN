@@ -682,7 +682,7 @@ textarea[aria-invalid="true"]:focus {
 
 .form-field-enhanced input.valid,
 .form-field-enhanced select.valid {
-  border-color: var(--success-color);
+  border-color: var(--border-color);
 }
 
 .form-field-enhanced input.invalid,
