@@ -4,7 +4,7 @@ A modern, extensible IBAN (International Bank Account Number) generator with a p
 
 ## 🚀 Features
 
-- **Multi-country support**: Generate valid IBANs for Netherlands, Germany, Belgium, France, Spain, and Italy
+- **Multi-country support**: Generate valid IBANs for 14 European countries including Netherlands, Germany, Belgium, France, Spain, Italy, Austria, Switzerland, Luxembourg, Portugal, United Kingdom, Sweden, Norway, and Denmark
 - **Plugin architecture**: Easy to extend with new countries without code changes
 - **Bank-specific generation**: Optional bank selection for realistic IBANs
 - **Bulk generation**: Generate up to 100 IBANs at once
@@ -106,16 +106,63 @@ src/
 
 ## 🌍 Supported Countries
 
-| Country | Code | Format Example | Bank Selection |
-|---------|------|----------------|----------------|
-| Netherlands | NL | NL91 ABNA 0417 1643 00 | ✅ |
-| Germany | DE | DE89 3704 0044 0532 0130 00 | ✅ |
-| Belgium | BE | BE68 5390 0754 7034 | ✅ |
-| France | FR | FR14 2004 1010 0505 0001 3M02 606 | ✅ |
-| Spain | ES | ES91 2100 0418 4502 0005 1332 | ✅ |
-| Italy | IT | IT60 X054 2811 1010 0000 0123 456 | ✅ |
+| Country | Code | Format Example | Length | Bank Selection |
+|---------|------|----------------|--------|----------------|
+| Netherlands | NL | NL91 ABNA 0417 1643 00 | 18 | ✅ |
+| Germany | DE | DE89 3704 0044 0532 0130 00 | 22 | ✅ |
+| Belgium | BE | BE68 5390 0754 7034 | 16 | ✅ |
+| France | FR | FR14 2004 1010 0505 0001 3M02 606 | 27 | ✅ |
+| Spain | ES | ES91 2100 0418 4502 0005 1332 | 24 | ✅ |
+| Italy | IT | IT60 X054 2811 1010 0000 0123 456 | 27 | ✅ |
+| Austria | AT | AT61 1904 3002 3457 3201 | 20 | ✅ |
+| Switzerland | CH | CH93 0076 2011 6238 5295 7 | 21 | ✅ |
+| Luxembourg | LU | LU28 0019 4006 4475 0000 | 20 | ✅ |
+| Portugal | PT | PT50 0002 0123 1234 5678 9015 4 | 25 | ✅ |
+| United Kingdom | GB | GB29 NWBK 6016 1331 9268 19 | 22 | ✅ |
+| Sweden | SE | SE45 5000 0000 0583 9825 7466 | 24 | ✅ |
+| Norway | NO | NO93 8601 1117 947 | 15 | ✅ |
+| Denmark | DK | DK50 0040 0440 1162 43 | 18 | ✅ |
+
+### Country-Specific Features
+
+#### 🇦🇹 Austria (AT)
+- **Format**: AT + 2 check + 5 bank code + 11 account number
+- **Banks**: Bank Austria, Erste Bank, Raiffeisen Bank
+
+#### 🇨🇭 Switzerland (CH)
+- **Format**: CH + 2 check + 5 bank code + 12 account number  
+- **Banks**: UBS, Credit Suisse, PostFinance
+
+#### 🇱🇺 Luxembourg (LU)
+- **Format**: LU + 2 check + 3 bank code + 13 account number
+- **Banks**: BGL BNP Paribas, Banque Internationale, Spuerkeess
+
+#### 🇵🇹 Portugal (PT)
+- **Format**: PT + 2 check + 4 bank code + 4 branch + 11 account + 2 national check
+- **Banks**: Millennium bcp, Caixa Geral, Santander
+- **Special**: Includes national check digits for additional validation
+
+#### 🇬🇧 United Kingdom (GB)
+- **Format**: GB + 2 check + 4 bank code + 6 sort code + 8 account number
+- **Banks**: Barclays, HSBC, Lloyds
+- **Special**: Uses sort codes for branch identification
+
+#### 🇸🇪 Sweden (SE)
+- **Format**: SE + 2 check + 3 bank code + 17 account number
+- **Banks**: Handelsbanken, Swedbank, SEB
+
+#### 🇳🇴 Norway (NO)
+- **Format**: NO + 2 check + 4 bank code + 7 account number
+- **Banks**: DNB, Nordea, SpareBank1
+- **Special**: Shortest IBAN format (15 characters)
+
+#### 🇩🇰 Denmark (DK)
+- **Format**: DK + 2 check + 4 bank code + 10 account number
+- **Banks**: Danske Bank, Nordea, Jyske Bank
 
 ## 📝 Adding a New Country
+
+The plugin architecture makes it easy to add new countries. Here's how:
 
 1. **Add IBAN specification** to `src/config/iban-specs.json`:
 ```json
@@ -125,7 +172,11 @@ src/
     "bankCodeLength": 4,
     "accountLength": 16,
     "bankCodeType": "numeric",
-    "accountType": "alphanumericUpper"
+    "accountType": "alphanumericUpper",
+    "branchCodeLength": 4,
+    "branchCodeType": "numeric",
+    "nationalCheckLength": 2,
+    "nationalCheckType": "numeric"
   }
 }
 ```
@@ -137,7 +188,14 @@ src/
 }
 ```
 
-3. **Add bank data** (optional) to `src/config/bank-data.json`
+3. **Add bank data** to `src/config/bank-data.json`:
+```json
+{
+  "XX": {
+    "BANKCODE": { "name": "Bank Name", "code": "BNKC" }
+  }
+}
+```
 
 4. **Create generator class**:
 ```typescript
@@ -148,13 +206,30 @@ export class NewCountryGenerator extends CountryGenerator {
 
   protected generateBBAN(bankInfo?: BankInfo | null): string {
     const bankCodePart = this.generateBankCodePart(bankInfo);
+    const branchCodePart = this.generateBranchCodePart(); // Optional
     const accountPart = this.generateAccountPart();
-    return bankCodePart + accountPart;
+    
+    // For countries with national check digits (like Portugal, Belgium)
+    const nationalCheckPart = this.calculateNationalCheck(
+      (bankCodePart + branchCodePart + accountPart).replace(/\D/g, '')
+    );
+    
+    return bankCodePart + branchCodePart + accountPart + nationalCheckPart;
   }
 }
 ```
 
-5. **Register in factory** (`src/generators/CountryGeneratorFactory.ts`)
+5. **Register in factory** (`src/generators/CountryGeneratorFactory.ts`):
+```typescript
+import { NewCountryGenerator } from './NewCountryGenerator';
+
+// In initializeGenerators():
+if (specs.XX) {
+  this.generators.set('XX', new NewCountryGenerator(specs.XX));
+}
+```
+
+6. **Add comprehensive tests** to verify the implementation works correctly
 
 ## 🔒 Security & Validation
 

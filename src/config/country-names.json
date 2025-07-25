@@ -4,5 +4,13 @@
   "BE": "Belgium",
   "FR": "France",
   "ES": "Spain",
-  "IT": "Italy"
+  "IT": "Italy",
+  "AT": "Austria",
+  "CH": "Switzerland",
+  "LU": "Luxembourg",
+  "PT": "Portugal",
+  "GB": "United Kingdom",
+  "SE": "Sweden",
+  "NO": "Norway",
+  "DK": "Denmark"
 }
