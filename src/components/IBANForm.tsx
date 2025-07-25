@@ -213,7 +213,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
           </p>
           {getFieldValidation('quantity')?.type === 'error' && (
             <p className={`error-message has-error ${
-              deferredFormData.quantity > 100 ? 'critical' : ''
+              deferredFormData.quantity > MAX_QUANTITY ? 'critical' : ''
             }`} role="alert">
               {getFieldValidation('quantity')?.message}
             </p>
