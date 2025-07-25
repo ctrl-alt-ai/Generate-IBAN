@@ -1,5 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
 
 // Translation resources
 const resources = {
@@ -190,12 +191,18 @@ const resources = {
 
 // Initialize i18n
 i18n
+  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'en', // default language
     fallbackLng: 'en',
     debug: false,
+    
+    // Language detection options
+    detection: {
+      order: ['navigator', 'htmlTag', 'path', 'subdomain'],
+      caches: ['localStorage'],
+    },
     
     interpolation: {
       escapeValue: false, // React already escapes values

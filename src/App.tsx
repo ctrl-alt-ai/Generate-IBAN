@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IBANForm } from './components/IBANForm';
 import { ResultsDisplay } from './components/ResultsDisplay';
-import { LanguageSelector } from './components/LanguageSelector';
 import { generateIBAN } from './utils/ibanGenerator';
 import { BANK_DATA, COUNTRY_NAMES } from './utils/constants';
 import type { FormData } from './utils/types';
@@ -102,7 +101,6 @@ function App() {
                 <h1>{t('title')}</h1>
                 <p className="subtitle">{t('subtitle')}</p>
               </div>
-              <LanguageSelector />
             </div>
           </header>
 

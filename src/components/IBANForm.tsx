@@ -33,19 +33,30 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   const deferredFormData = useDeferredValue(formData);
   const { isFormValid, getFieldValidation } = useFormValidation(deferredFormData);
 
-  // Memoized bank loading function
-  const loadBanksForCountry = useCallback((country: string) => {
+  // Update bank selector when country changes
+  useEffect(() => {
+    const banksForCountry = BANK_DATA[formData.country];
     setIsBanksLoading(true);
     
-    // Simulate async bank loading (in a real app, this might be an API call)
     startTransition(() => {
-      const banksForCountry = BANK_DATA[country];
       if (banksForCountry && Object.keys(banksForCountry).length > 0) {
         setAvailableBanks(banksForCountry);
         setShowBankSelector(true);
-        // Set first bank as default
-        const firstBankKey = Object.keys(banksForCountry)[0];
-        setFormData(prev => ({ ...prev, bank: firstBankKey }));
+        
+        // Only set first bank as default if no bank is currently selected or if the current bank is not available for this country
+        setFormData(prev => {
+          const currentBank = prev.bank;
+          const isCurrentBankAvailable = currentBank && banksForCountry[currentBank];
+          
+          if (!currentBank || !isCurrentBankAvailable) {
+            // Set first bank as default
+            const firstBankKey = Object.keys(banksForCountry)[0];
+            return { ...prev, bank: firstBankKey };
+          }
+          
+          // Keep the current bank selection
+          return prev;
+        });
       } else {
         setAvailableBanks({});
         setShowBankSelector(false);
@@ -53,12 +64,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
       }
       setIsBanksLoading(false);
     });
-  }, []);
-
-  // Update bank selector when country changes
-  useEffect(() => {
-    loadBanksForCountry(formData.country);
-  }, [formData.country, loadBanksForCountry]);
+  }, [formData.country]);
 
   const handleCountryChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
     startTransition(() => {
@@ -70,12 +76,10 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   }, []);
 
   const handleBankChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-    startTransition(() => {
-      setFormData(prev => ({
-        ...prev,
-        bank: event.target.value,
-      }));
-    });
+    setFormData(prev => ({
+      ...prev,
+      bank: event.target.value,
+    }));
   }, []);
 
   const handleQuantityChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,19 +99,6 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
     }
   }, [isFormValid, isGenerating, onGenerate, deferredFormData]);
 
-  // Memoized validation message component
-  const ValidationMessage = memo(({ validation }: { validation: ReturnType<typeof getFieldValidation> }) => {
-    if (!validation) return null;
-    
-    return (
-      <p className={`validation-message ${validation.type}`} role={validation.type === 'error' ? 'alert' : 'status'}>
-        {validation.type === 'error' && '⚠️ '}
-        {validation.type === 'warning' && '⚠️ '}
-        {validation.type === 'success' && '✓ '}
-        {validation.message}
-      </p>
-    );
-  });
 
   // Memoized sorted countries to prevent unnecessary re-renders
   const sortedCountries = React.useMemo(() => 
@@ -136,7 +127,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
             value={formData.country}
             onChange={handleCountryChange}
             required
-            aria-describedby="country-help country-validation"
+            aria-describedby="country-help"
             aria-invalid={getFieldValidation('country')?.type === 'error' ? 'true' : 'false'}
             className={getFieldValidation('country')?.type === 'error' ? 'invalid' : 
                       getFieldValidation('country')?.type === 'success' ? 'valid' : ''}
@@ -150,9 +141,6 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
           <p id="country-help" className="help-text">
             {t('form.country.help')}
           </p>
-          <div id="country-validation">
-            <ValidationMessage validation={getFieldValidation('country')} />
-          </div>
           {errors.country && (
             <p className="error-message has-error" role="alert">
               {errors.country}
@@ -174,7 +162,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
               name="bank"
               value={formData.bank}
               onChange={handleBankChange}
-              aria-describedby="bank-help bank-validation"
+              aria-describedby="bank-help"
               aria-invalid={getFieldValidation('bank')?.type === 'error' ? 'true' : 'false'}
               className={getFieldValidation('bank')?.type === 'error' ? 'invalid' : 
                         getFieldValidation('bank')?.type === 'success' ? 'valid' : ''}
@@ -188,9 +176,6 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
             <p id="bank-help" className="help-text">
               {t('form.bank.help', { country: COUNTRY_NAMES[formData.country] || formData.country })}
             </p>
-            <div id="bank-validation">
-              <ValidationMessage validation={getFieldValidation('bank')} />
-            </div>
             {errors.bank && (
               <p className="error-message has-error" role="alert">
                 {errors.bank}
@@ -217,7 +202,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
             onChange={handleQuantityChange}
             required
             autoComplete="off"
-            aria-describedby="quantity-help quantity-validation"
+            aria-describedby="quantity-help"
             aria-invalid={getFieldValidation('quantity')?.type === 'error' ? 'true' : 'false'}
             className={getFieldValidation('quantity')?.type === 'error' ? 'invalid' : 
                       getFieldValidation('quantity')?.type === 'success' ? 'valid' : ''}
@@ -225,9 +210,6 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
           <p id="quantity-help" className="help-text">
             {t('form.quantity.help')}
           </p>
-          <div id="quantity-validation">
-            <ValidationMessage validation={getFieldValidation('quantity')} />
-          </div>
           {errors.quantity && (
             <p className="error-message has-error" role="alert">
               {errors.quantity}
