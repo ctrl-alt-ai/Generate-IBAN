@@ -40,5 +40,45 @@
     "BCITITMM": { "name": "Intesa Sanpaolo", "code": "03069" },
     "BNLIITRR": { "name": "BNL", "code": "01005" },
     "MPSITIT1": { "name": "Monte dei Paschi", "code": "01030" }
+  },
+  "AT": {
+    "BKAUATWW": { "name": "Bank Austria", "code": "12000" },
+    "GIBAATWW": { "name": "Erste Bank", "code": "20111" },
+    "RLNWATWW": { "name": "Raiffeisen Bank", "code": "32000" }
+  },
+  "CH": {
+    "UBSWCHZH": { "name": "UBS", "code": "00240" },
+    "CRESCHZZ": { "name": "Credit Suisse", "code": "00254" },
+    "POFICHBE": { "name": "PostFinance", "code": "09000" }
+  },
+  "LU": {
+    "BGLLLULL": { "name": "BGL BNP Paribas", "code": "001" },
+    "BILLLULL": { "name": "Banque Internationale", "code": "010" },
+    "BCEILULL": { "name": "Spuerkeess", "code": "111" }
+  },
+  "PT": {
+    "BCOMPTPL": { "name": "Millennium bcp", "code": "0033" },
+    "CGDIPTPL": { "name": "Caixa Geral", "code": "0035" },
+    "BSCHPTPL": { "name": "Santander", "code": "0018" }
+  },
+  "GB": {
+    "BARCGB22": { "name": "Barclays", "code": "BARC" },
+    "MIDLGB22": { "name": "HSBC", "code": "MIDL" },
+    "LLOYGB21": { "name": "Lloyds", "code": "LLOY" }
+  },
+  "SE": {
+    "HANDSESS": { "name": "Handelsbanken", "code": "600" },
+    "SWEDSESS": { "name": "Swedbank", "code": "800" },
+    "ESSESESS": { "name": "SEB", "code": "500" }
+  },
+  "NO": {
+    "DNBANOKKXXX": { "name": "DNB", "code": "1200" },
+    "NDEANOKKXXX": { "name": "Nordea", "code": "6000" },
+    "SPRONO22XXX": { "name": "SpareBank1", "code": "3000" }
+  },
+  "DK": {
+    "DABADKKK": { "name": "Danske Bank", "code": "0040" },
+    "NDEADKKK": { "name": "Nordea", "code": "2000" },
+    "JYBADKKK": { "name": "Jyske Bank", "code": "7780" }
   }
 }

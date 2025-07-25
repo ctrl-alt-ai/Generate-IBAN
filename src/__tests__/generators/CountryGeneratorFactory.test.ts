@@ -11,7 +11,7 @@ describe('CountryGeneratorFactory', () => {
   });
 
   test('should create generators for all supported countries', () => {
-    const supportedCountries = ['NL', 'DE', 'BE', 'FR', 'ES', 'IT'];
+    const supportedCountries = ['NL', 'DE', 'BE', 'FR', 'ES', 'IT', 'AT', 'CH', 'LU', 'PT', 'GB', 'SE', 'NO', 'DK'];
     const availableCountries = factory.getAvailableCountries();
     
     expect(availableCountries.sort()).toEqual(supportedCountries.sort());
@@ -54,7 +54,7 @@ describe('CountryGeneratorFactory', () => {
   });
 
   test('should generate IBANs for all supported countries', () => {
-    const supportedCountries = ['NL', 'DE', 'BE', 'FR', 'ES', 'IT'];
+    const supportedCountries = ['NL', 'DE', 'BE', 'FR', 'ES', 'IT', 'AT', 'CH', 'LU', 'PT', 'GB', 'SE', 'NO', 'DK'];
     
     supportedCountries.forEach(country => {
       const generator = factory.getGenerator(country);

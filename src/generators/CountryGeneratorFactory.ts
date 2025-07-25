@@ -5,6 +5,14 @@ import { BelgiumGenerator } from './BelgiumGenerator';
 import { FranceGenerator } from './FranceGenerator';
 import { SpainGenerator } from './SpainGenerator';
 import { ItalyGenerator } from './ItalyGenerator';
+import { AustriaGenerator } from './AustriaGenerator';
+import { SwitzerlandGenerator } from './SwitzerlandGenerator';
+import { LuxembourgGenerator } from './LuxembourgGenerator';
+import { PortugalGenerator } from './PortugalGenerator';
+import { UnitedKingdomGenerator } from './UnitedKingdomGenerator';
+import { SwedenGenerator } from './SwedenGenerator';
+import { NorwayGenerator } from './NorwayGenerator';
+import { DenmarkGenerator } from './DenmarkGenerator';
 import { CountryNotSupportedError } from '../errors/IBANErrors';
 import { ConfigLoader } from '../config/ConfigLoader';
 
@@ -45,6 +53,30 @@ export class CountryGeneratorFactory {
     }
     if (specs.IT) {
       this.generators.set('IT', new ItalyGenerator(specs.IT));
+    }
+    if (specs.AT) {
+      this.generators.set('AT', new AustriaGenerator(specs.AT));
+    }
+    if (specs.CH) {
+      this.generators.set('CH', new SwitzerlandGenerator(specs.CH));
+    }
+    if (specs.LU) {
+      this.generators.set('LU', new LuxembourgGenerator(specs.LU));
+    }
+    if (specs.PT) {
+      this.generators.set('PT', new PortugalGenerator(specs.PT));
+    }
+    if (specs.GB) {
+      this.generators.set('GB', new UnitedKingdomGenerator(specs.GB));
+    }
+    if (specs.SE) {
+      this.generators.set('SE', new SwedenGenerator(specs.SE));
+    }
+    if (specs.NO) {
+      this.generators.set('NO', new NorwayGenerator(specs.NO));
+    }
+    if (specs.DK) {
+      this.generators.set('DK', new DenmarkGenerator(specs.DK));
     }
   }
 
