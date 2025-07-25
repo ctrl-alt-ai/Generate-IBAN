@@ -3,6 +3,11 @@ import { ConfigLoader } from '../config/ConfigLoader';
 import type { FormData, BankInfo } from './types';
 
 /**
+ * Maximum number of IBANs that can be generated in a single request
+ */
+export const MAX_QUANTITY = 100;
+
+/**
  * Validation utilities for IBAN generation
  */
 export class ValidationUtils {
@@ -64,8 +69,8 @@ export class ValidationUtils {
       throw new ValidationError('Quantity must be at least 1');
     }
 
-    if (quantity > 100) {
-      throw new ValidationError('Quantity must not exceed 100');
+    if (quantity > MAX_QUANTITY) {
+      throw new ValidationError(`Quantity must not exceed ${MAX_QUANTITY}`);
     }
   }
 

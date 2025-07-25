@@ -2,10 +2,14 @@ import React, { useState, useEffect, useDeferredValue, startTransition, memo, us
 import { useTranslation } from 'react-i18next';
 import { COUNTRY_NAMES, BANK_DATA } from '../utils/constants';
 import { getSuggestedCountry } from '../utils/ibanGenerator';
+import { MAX_QUANTITY } from '../utils/validation';
 import { useFormValidation } from '../hooks/useFormValidation';
 import { SkeletonLoader } from './SkeletonLoader';
 import { CountryGeneratorFactory } from '../generators/CountryGeneratorFactory';
 import type { BankInfo, FormData } from '../utils/types';
+
+// Create factory instance outside component to avoid re-instantiation on every render
+const countryGeneratorFactory = new CountryGeneratorFactory();
 
 interface IBANFormProps {
   onGenerate: (data: FormData) => void;
@@ -103,7 +107,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
 
   // Memoized sorted countries to prevent unnecessary re-renders
   const sortedCountries = React.useMemo(() => {
-    return countryGeneratorFactory.getAvailableCountries().sort((a, b) =>
+    return countryGeneratorFactory.getAvailableCountries().sort((a: string, b: string) =>
       (COUNTRY_NAMES[a] || a).localeCompare(COUNTRY_NAMES[b] || b)
     );
   }, []);
@@ -133,7 +137,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
             className={getFieldValidation('country')?.type === 'error' ? 'invalid' : 
                       getFieldValidation('country')?.type === 'success' ? 'valid' : ''}
           >
-            {sortedCountries.map((countryCode) => (
+            {sortedCountries.map((countryCode: string) => (
               <option key={countryCode} value={countryCode}>
                 {COUNTRY_NAMES[countryCode] || countryCode}
               </option>
