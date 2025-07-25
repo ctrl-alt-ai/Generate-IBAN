@@ -1,7 +1,6 @@
 import { IBAN_SPECS } from './constants';
 import type { BankInfo } from './types';
 import { CountryGeneratorFactory } from '../generators/CountryGeneratorFactory';
-import { IBANError } from '../errors/IBANErrors';
 import { generateRandomChars, calculateMod97Check } from './randomUtils';
 import { getBrowserLanguage } from './platformUtils';
 
@@ -35,14 +34,8 @@ export function generateIBAN(country: string, bankInfo?: BankInfo | null): strin
 export function generateIBANLegacy(country: string, bankInfo?: BankInfo | null): string | null {
   try {
     return generateIBAN(country, bankInfo);
-  } catch (error) {
-    if (error instanceof IBANError) {
-      // Log error but return null for backward compatibility
-      console.error(error.message);
-      return null;
-    }
-    // Log unexpected errors
-    console.error(`Unexpected error generating IBAN for ${country}:`, error);
+  } catch {
+    // Return null for backward compatibility - no console pollution
     return null;
   }
 }

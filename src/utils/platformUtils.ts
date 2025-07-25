@@ -31,7 +31,7 @@ export function getSecureRandom(length: number): Uint32Array {
   }
   
   // Fallback for environments without secure random (not recommended for production)
-  console.warn('Secure random number generation not available, using Math.random() fallback');
+  // Note: This fallback should not be used in production environments
   for (let i = 0; i < length; i++) {
     array[i] = Math.floor(Math.random() * 0xFFFFFFFF);
   }

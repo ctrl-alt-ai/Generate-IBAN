@@ -49,7 +49,7 @@ export function generateRandomChars(length: number, type: CharacterType = 'numer
  */
 export function calculateMod97Check(numericString: string): string {
   if (!numericString || !/^\d+$/.test(numericString)) {
-    console.warn(`Invalid input for mod-97 calculation: ${numericString}`);
+    // Return default value silently - no console pollution in production
     return '00';
   }
 
@@ -63,8 +63,8 @@ export function calculateMod97Check(numericString: string): string {
     // For Belgian IBANs: check digits = 98 - remainder
     const check = 98 - remainder;
     return check < 10 ? `0${check}` : `${check}`;
-  } catch (e) {
-    console.error('Error during mod-97 check calculation:', e);
+  } catch {
+    // Return fallback value silently - no console pollution in production
     return '99';
   }
 }
