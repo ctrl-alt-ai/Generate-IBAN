@@ -1,5 +1,5 @@
 import type { CharacterType } from './types';
-import { getSecureRandom, isSecureCryptoAvailable } from './platformUtils';
+import { getSecureRandom } from './platformUtils';
 
 /**
  * Generates random characters of specified type
@@ -30,10 +30,6 @@ export function generateRandomChars(length: number, type: CharacterType = 'numer
       break;
     default:
       throw new Error(`Invalid character type: ${type}`);
-  }
-
-  if (!isSecureCryptoAvailable()) {
-    throw new Error('Secure random number generation is not supported in this environment. Please use a modern browser or Node.js environment that supports secure random generation.');
   }
 
   const randomValues = getSecureRandom(length);
