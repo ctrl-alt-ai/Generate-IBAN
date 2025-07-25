@@ -176,7 +176,6 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
             <p id="bank-help" className="help-text">
               {t('form.bank.help', { country: COUNTRY_NAMES[formData.country] || formData.country })}
             </p>
-
             {errors.bank && (
               <p className="error-message has-error" role="alert">
                 {errors.bank}
