@@ -1,4 +1,5 @@
 import type { CharacterType } from './types';
+import { getSecureRandom, isSecureCryptoAvailable } from './platformUtils';
 
 /**
  * Generates random characters of specified type
@@ -31,15 +32,13 @@ export function generateRandomChars(length: number, type: CharacterType = 'numer
       throw new Error(`Invalid character type: ${type}`);
   }
 
-  if (window.crypto && window.crypto.getRandomValues) {
-    const randomValues = new Uint32Array(length);
-    window.crypto.getRandomValues(randomValues);
+  if (!isSecureCryptoAvailable()) {
+    throw new Error('Secure random number generation is not supported in this environment. Please use a modern browser or Node.js environment that supports secure random generation.');
+  }
 
-    for (let i = 0; i < length; i++) {
-      result += chars[randomValues[i] % chars.length];
-    }
-  } else {
-    throw new Error('Secure random number generation is not supported in this browser. Please use a modern browser that supports the Web Crypto API.');
+  const randomValues = getSecureRandom(length);
+  for (let i = 0; i < length; i++) {
+    result += chars[randomValues[i] % chars.length];
   }
 
   return result;
