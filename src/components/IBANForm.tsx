@@ -103,8 +103,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
 
   // Memoized sorted countries to prevent unnecessary re-renders
   const sortedCountries = React.useMemo(() => {
-    const factory = new CountryGeneratorFactory();
-    return factory.getAvailableCountries().sort((a, b) =>
+    return countryGeneratorFactory.getAvailableCountries().sort((a, b) =>
       (COUNTRY_NAMES[a] || a).localeCompare(COUNTRY_NAMES[b] || b)
     );
   }, []);
