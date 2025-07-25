@@ -72,12 +72,10 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   }, [formData.country]);
 
   const handleCountryChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-    startTransition(() => {
-      setFormData(prev => ({
-        ...prev,
-        country: event.target.value,
-      }));
-    });
+    setFormData(prev => ({
+      ...prev,
+      country: event.target.value,
+    }));
   }, []);
 
   const handleBankChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -89,12 +87,10 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
 
   const handleQuantityChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value) || 1;
-    startTransition(() => {
-      setFormData(prev => ({
-        ...prev,
-        quantity: value,
-      }));
-    });
+    setFormData(prev => ({
+      ...prev,
+      quantity: value,
+    }));
   }, []);
 
   const handleSubmit = useCallback((event: React.FormEvent) => {
