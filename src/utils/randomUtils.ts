@@ -1,4 +1,5 @@
 import type { CharacterType } from './types';
+import { getSecureRandom } from './platformUtils';
 
 /**
  * Generates random characters of specified type
@@ -31,15 +32,14 @@ export function generateRandomChars(length: number, type: CharacterType = 'numer
       throw new Error(`Invalid character type: ${type}`);
   }
 
-  if (window.crypto && window.crypto.getRandomValues) {
-    const randomValues = new Uint32Array(length);
-    window.crypto.getRandomValues(randomValues);
-
-    for (let i = 0; i < length; i++) {
-      result += chars[randomValues[i] % chars.length];
-    }
-  } else {
-    throw new Error('Secure random number generation is not supported in this browser. Please use a modern browser that supports the Web Crypto API.');
+  // Use rejection sampling to avoid modulo bias
+  const maxMultiple = Math.floor(256 / chars.length) * chars.length;
+  let generated = 0;
+  while (generated < length) {
+    const randomByte = getSecureRandom(1)[0];
+    if (randomByte >= maxMultiple) continue; // Discard biased values
+    result += chars[randomByte % chars.length];
+    generated++;
   }
 
   return result;
@@ -50,7 +50,7 @@ export function generateRandomChars(length: number, type: CharacterType = 'numer
  */
 export function calculateMod97Check(numericString: string): string {
   if (!numericString || !/^\d+$/.test(numericString)) {
-    console.warn(`Invalid input for mod-97 calculation: ${numericString}`);
+    // Return default value silently - no console pollution in production
     return '00';
   }
 
@@ -64,8 +64,8 @@ export function calculateMod97Check(numericString: string): string {
     // For Belgian IBANs: check digits = 98 - remainder
     const check = 98 - remainder;
     return check < 10 ? `0${check}` : `${check}`;
-  } catch (e) {
-    console.error('Error during mod-97 check calculation:', e);
+  } catch {
+    // Return fallback value silently - no console pollution in production
     return '99';
   }
 }

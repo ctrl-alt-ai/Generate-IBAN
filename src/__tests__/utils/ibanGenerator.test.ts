@@ -6,6 +6,7 @@ import {
   generateRandomChars,
   calculateMod97Check 
 } from '../../utils/ibanGenerator';
+import { CountryNotSupportedError } from '../../errors/IBANErrors';
 import type { BankInfo } from '../../utils/types';
 
 // Mock navigator.language for getSuggestedCountry tests
@@ -44,9 +45,8 @@ describe('IBAN Generator Utils', () => {
       expect(iban).toMatch(/^NL\d{2}ABNA\d{10}$/);
     });
 
-    test('should return null for unsupported country', () => {
-      const iban = generateIBAN('XX');
-      expect(iban).toBeNull();
+    test('should throw error for unsupported country', () => {
+      expect(() => generateIBAN('XX')).toThrow(CountryNotSupportedError);
     });
 
     test('should generate different IBANs on multiple calls', () => {

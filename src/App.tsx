@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IBANForm } from './components/IBANForm';
 import { ResultsDisplay } from './components/ResultsDisplay';
-import { generateIBAN } from './utils/ibanGenerator';
+import { generateIBANLegacy } from './utils/ibanGenerator';
 import { BANK_DATA, COUNTRY_NAMES } from './utils/constants';
 import type { FormData } from './utils/types';
 import './styles/App.css';
@@ -57,7 +57,7 @@ function App() {
 
       // Generate IBANs
       for (let i = 0; i < data.quantity; i++) {
-        const iban = generateIBAN(data.country, bankInfo);
+        const iban = generateIBANLegacy(data.country, bankInfo);
         if (iban) {
           newResults.push(iban);
         } else {
