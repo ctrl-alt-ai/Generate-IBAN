@@ -52,7 +52,8 @@ const resources = {
         download: 'Download Results (.txt)',
         copySuccess: 'Copied to clipboard!',
         copyAllSuccess: 'All IBANs copied to clipboard!',
-        copyButton: 'Copy IBAN'
+        copyButton: 'Copy IBAN',
+        copyAll: 'Copy All'
       },
       
       // Error messages
@@ -114,7 +115,8 @@ const resources = {
         download: 'Download Resultaten (.txt)',
         copySuccess: 'Gekopieerd!',
         copyAllSuccess: 'Alle IBANs gekopieerd!',
-        copyButton: 'Kopieer IBAN'
+        copyButton: 'Kopieer IBAN',
+        copyAll: 'Kopieer Alles'
       },
       
       // Error messages
@@ -176,7 +178,8 @@ const resources = {
         download: 'Ergebnisse herunterladen (.txt)',
         copySuccess: 'In die Zwischenablage kopiert!',
         copyAllSuccess: 'Alle IBANs in die Zwischenablage kopiert!',
-        copyButton: 'IBAN kopieren'
+        copyButton: 'IBAN kopieren',
+        copyAll: 'Alle kopieren'
       },
       
       // Error messages

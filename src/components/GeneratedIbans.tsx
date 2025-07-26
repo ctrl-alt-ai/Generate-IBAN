@@ -192,7 +192,7 @@ export const GeneratedIbans: React.FC<GeneratedIbansProps> = ({ results, country
             onClick={handleCopyAll}
             aria-label="Copy all IBANs to clipboard"
           >
-            Copy All
+            {t('results.copyAll')}
           </button>
           <button 
             type="button" 
