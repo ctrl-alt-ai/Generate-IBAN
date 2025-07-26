@@ -32,9 +32,14 @@ export function generateRandomChars(length: number, type: CharacterType = 'numer
       throw new Error(`Invalid character type: ${type}`);
   }
 
-  const randomValues = getSecureRandom(length);
-  for (let i = 0; i < length; i++) {
-    result += chars[randomValues[i] % chars.length];
+  // Use rejection sampling to avoid modulo bias
+  const maxMultiple = Math.floor(256 / chars.length) * chars.length;
+  let generated = 0;
+  while (generated < length) {
+    const randomByte = getSecureRandom(1)[0];
+    if (randomByte >= maxMultiple) continue; // Discard biased values
+    result += chars[randomByte % chars.length];
+    generated++;
   }
 
   return result;
