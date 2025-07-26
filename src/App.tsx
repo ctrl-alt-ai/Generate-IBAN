@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IBANForm } from './components/IBANForm';
-import { ResultsDisplay } from './components/ResultsDisplay';
+import { IbanGeneratorForm } from './components/IbanGeneratorForm';
+import { GeneratedIbans } from './components/GeneratedIbans';
 import { generateIBAN } from './utils/ibanGenerator';
 import { BANK_DATA, COUNTRY_NAMES } from './utils/constants';
 import type { FormData } from './utils/types';
@@ -111,13 +111,13 @@ function App() {
               </p>
             </noscript>
 
-            <IBANForm 
+            <IbanGeneratorForm 
               onGenerate={handleGenerate}
               isGenerating={isGenerating}
               errors={errors}
             />
 
-            <ResultsDisplay 
+            <GeneratedIbans 
               results={results}
               country={currentCountry}
             />

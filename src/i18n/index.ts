@@ -51,7 +51,9 @@ const resources = {
         helpText: 'Generated IBANs, one per line.',
         download: 'Download Results (.txt)',
         copySuccess: 'Copied to clipboard!',
-        copyButton: 'Copy IBAN'
+        copyAllSuccess: 'All IBANs copied to clipboard!',
+        copyButton: 'Copy IBAN',
+        copyAll: 'Copy All'
       },
       
       // Error messages
@@ -112,7 +114,9 @@ const resources = {
         helpText: 'Gegenereerde IBANs, één per regel.',
         download: 'Download Resultaten (.txt)',
         copySuccess: 'Gekopieerd!',
-        copyButton: 'Kopieer IBAN'
+        copyAllSuccess: 'Alle IBANs gekopieerd!',
+        copyButton: 'Kopieer IBAN',
+        copyAll: 'Kopieer Alles'
       },
       
       // Error messages
@@ -173,7 +177,9 @@ const resources = {
         helpText: 'Generierte IBANs, eine pro Zeile.',
         download: 'Ergebnisse herunterladen (.txt)',
         copySuccess: 'In die Zwischenablage kopiert!',
-        copyButton: 'IBAN kopieren'
+        copyAllSuccess: 'Alle IBANs in die Zwischenablage kopiert!',
+        copyButton: 'IBAN kopieren',
+        copyAll: 'Alle kopieren'
       },
       
       // Error messages
