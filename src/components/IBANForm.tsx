@@ -41,9 +41,10 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   // Update bank selector when country changes
   useEffect(() => {
     const banksForCountry = BANK_DATA[formData.country];
-    setIsBanksLoading(true);
     
     startTransition(() => {
+      setIsBanksLoading(true);
+      
       if (banksForCountry && Object.keys(banksForCountry).length > 0) {
         setAvailableBanks(banksForCountry);
         setShowBankSelector(true);
