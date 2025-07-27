@@ -48,19 +48,16 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
         setAvailableBanks(banksForCountry);
         setShowBankSelector(true);
         
-        // Only set first bank as default if no bank is currently selected or if the current bank is not available for this country
+        // Always select first available bank as default, unless current bank is still valid
         setFormData(prev => {
           const currentBank = prev.bank;
-          const isCurrentBankAvailable = currentBank && banksForCountry[currentBank];
+          const isCurrentBankValid = currentBank && banksForCountry[currentBank];
+          const firstBankKey = Object.keys(banksForCountry)[0];
           
-          if (!currentBank || !isCurrentBankAvailable) {
-            // Set first bank as default
-            const firstBankKey = Object.keys(banksForCountry)[0];
-            return { ...prev, bank: firstBankKey };
-          }
-          
-          // Keep the current bank selection
-          return prev;
+          return {
+            ...prev,
+            bank: isCurrentBankValid ? currentBank : firstBankKey
+          };
         });
       } else {
         setAvailableBanks({});
@@ -159,6 +156,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
           <div className="form-group has-validation form-field-enhanced" id="bank-container">
             <label htmlFor="bank">{t('form.bank.label')}</label>
             <select
+              key={`bank-${formData.country}`}
               id="bank"
               name="bank"
               value={formData.bank}
