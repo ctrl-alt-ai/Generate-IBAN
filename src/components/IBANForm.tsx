@@ -156,7 +156,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
           <div className="form-group has-validation form-field-enhanced" id="bank-container">
             <label htmlFor="bank">{t('form.bank.label')}</label>
             <select
-              key={'bank-' + formData.country}
+              key={`bank-${formData.country}`}
               id="bank"
               name="bank"
               value={formData.bank}
