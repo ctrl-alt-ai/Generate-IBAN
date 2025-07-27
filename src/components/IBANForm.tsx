@@ -44,6 +44,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
     setIsBanksLoading(true);
     
     startTransition(() => {
+      
       if (banksForCountry && Object.keys(banksForCountry).length > 0) {
         setAvailableBanks(banksForCountry);
         setShowBankSelector(true);
