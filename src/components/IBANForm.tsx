@@ -8,12 +8,22 @@ import { SkeletonLoader } from './SkeletonLoader';
 import { CountryGeneratorFactory } from '../generators/CountryGeneratorFactory';
 import type { BankInfo, FormData } from '../utils/types';
 
-// Create factory instance outside component to avoid re-instantiation on every render
+/**
+ * Factory instance created outside component scope to prevent re-instantiation
+ * This optimization ensures the factory is only created once across all form renders
+ */
 const countryGeneratorFactory = new CountryGeneratorFactory();
 
+/**
+ * Props interface for the IBANForm component
+ * Defines the contract for form interactions and error handling
+ */
 interface IBANFormProps {
+  /** Callback function called when form is submitted with valid data */
   onGenerate: (data: FormData) => void;
+  /** Flag indicating if IBAN generation is currently in progress */
   isGenerating: boolean;
+  /** Object containing field-specific and general error messages */
   errors: {
     country?: string;
     bank?: string;
@@ -24,12 +34,15 @@ interface IBANFormProps {
 
 export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGenerating, errors }) => {
   const { t } = useTranslation();
+  
+  // Initialize form state with suggested country based on user's locale
   const [formData, setFormData] = useState<FormData>({
     country: getSuggestedCountry(),
     bank: '',
     quantity: 1,
   });
   
+  // Bank selector state management for dynamic bank loading
   const [showBankSelector, setShowBankSelector] = useState(false);
   const [availableBanks, setAvailableBanks] = useState<{ [key: string]: BankInfo }>({});
   const [isBanksLoading, setIsBanksLoading] = useState(false);
@@ -40,7 +53,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   const isMountedRef = useRef(true);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Use React 18 performance features
+  // React 18 performance optimizations: deferred values and concurrent features
   const deferredFormData = useDeferredValue(formData);
   const { isFormValid, getFieldValidation } = useFormValidation(deferredFormData);
 
@@ -55,17 +68,19 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
     };
   }, []);
 
-  // Update bank selector when country changes with improved race condition handling
+  // Dynamic bank loading effect: updates available banks when country changes
+  // Uses startTransition for improved UX during rapid country switching
   useEffect(() => {
     const banksForCountry = BANK_DATA[formData.country];
     setIsBanksLoading(true);
     
+    // Wrap state updates in startTransition to prevent blocking UI updates
     startTransition(() => {
       if (banksForCountry && Object.keys(banksForCountry).length > 0) {
         setAvailableBanks(banksForCountry);
         setShowBankSelector(true);
         
-        // Preserve current bank selection if still valid for new country, otherwise select first available
+        // Smart bank selection: preserve current selection if valid, otherwise pick first available
         setFormData(prev => {
           const currentBank = prev.bank;
           const isCurrentBankValid = currentBank && banksForCountry[currentBank];
@@ -77,7 +92,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
           };
         });
       } else {
-        // No banks available for selected country - hide bank selector and clear selection
+        // Handle countries without specific bank data
         setAvailableBanks({});
         setShowBankSelector(false);
         setFormData(prev => ({ ...prev, bank: '' }));
@@ -126,6 +141,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
     }
   }, []);
 
+  // Form submission handler with validation checks
   const handleSubmit = useCallback((event: React.FormEvent) => {
     event.preventDefault();
     if (isFormValid && !isGenerating) {
@@ -133,14 +149,16 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
     }
   }, [isFormValid, isGenerating, onGenerate, deferredFormData]);
 
-  // Memoized sorted countries to prevent unnecessary re-renders
+  // Performance optimization: memoized sorted countries list to prevent unnecessary re-renders
+  // Countries are sorted alphabetically by their display names for better UX
   const sortedCountries = React.useMemo(() => {
     return countryGeneratorFactory.getAvailableCountries().sort((a: string, b: string) =>
       (COUNTRY_NAMES[a] || a).localeCompare(COUNTRY_NAMES[b] || b)
     );
   }, []);
 
-  // Memoized sorted banks to optimize rendering performance
+  // Performance optimization: memoized sorted banks list that updates when available banks change
+  // Banks are sorted alphabetically by name or BIC code for consistent ordering
   const sortedBanks = React.useMemo(() => 
     Object.entries(availableBanks).sort((a, b) =>
       (a[1].name || a[0]).localeCompare(b[1].name || b[0])

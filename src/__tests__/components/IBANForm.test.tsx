@@ -5,7 +5,11 @@ import { IBANForm } from '../../components/IBANForm';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../../i18n';
 
-// Mock the constants to avoid external dependencies and ensure predictable test data
+/**
+ * Mock constants to create isolated, predictable test environment
+ * This prevents external dependencies from affecting test results
+ * and ensures consistent test data across different environments
+ */
 jest.mock('../../utils/constants', () => ({
   COUNTRY_NAMES: {
     'NL': 'Netherlands',
@@ -33,8 +37,13 @@ jest.mock('../../utils/constants', () => ({
   }
 }));
 
+// Mock callback function for form submission testing
 const mockOnGenerate = jest.fn();
 
+/**
+ * Helper function to render IBANForm with default props and i18n context
+ * Provides consistent setup for all test cases
+ */
 const renderIBANForm = (props = {}) => {
   const defaultProps = {
     onGenerate: mockOnGenerate,
@@ -49,21 +58,32 @@ const renderIBANForm = (props = {}) => {
   );
 };
 
+/**
+ * Test suite focused on dropdown interaction behavior and rapid state changes
+ * These tests verify the fixes for dropdown closure issues during rapid switching
+ * between countries and banks, ensuring smooth user experience
+ */
 describe('IBANForm Dropdown Interactions', () => {
   beforeEach(() => {
+    // Reset mock function call history before each test
     mockOnGenerate.mockClear();
   });
 
+  /**
+   * Test case: Rapid country switching behavior
+   * Verifies that the form can handle quick consecutive country changes
+   * without dropdown closure issues or race conditions
+   */
   test('should handle rapid country switching', async () => {
     const user = userEvent.setup({ delay: null });
     renderIBANForm();
 
     const countrySelect = screen.getByLabelText(/country/i) as HTMLSelectElement;
 
-    // Initial state should be NL
+    // Verify initial state matches expected default
     expect(countrySelect.value).toBe('NL');
 
-    // Rapidly switch countries
+    // Perform rapid country switching to test dropdown stability
     await act(async () => {
       await user.selectOptions(countrySelect, 'DE');
     });
@@ -81,7 +101,7 @@ describe('IBANForm Dropdown Interactions', () => {
       expect(countrySelect.value).toBe('FR');
     });
 
-    // Bank dropdown should be present and functional
+    // Verify bank dropdown remains functional after rapid country changes
     await waitFor(() => {
       const bankSelect = screen.getByLabelText(/bank/i) as HTMLSelectElement;
       expect(bankSelect).toBeDefined();
@@ -89,13 +109,18 @@ describe('IBANForm Dropdown Interactions', () => {
     }, { timeout: 1000 });
   });
 
+  /**
+   * Test case: Multiple consecutive dropdown changes
+   * Tests a sequence of rapid changes across different countries
+   * to ensure consistent behavior and proper state management
+   */
   test('should handle multiple consecutive changes', async () => {
     const user = userEvent.setup({ delay: 10 });
     renderIBANForm();
 
     const countrySelect = screen.getByLabelText(/country/i) as HTMLSelectElement;
 
-    // Sequence of rapid changes
+    // Test sequence of countries with different bank configurations
     const countries = ['DE', 'FR', 'IT', 'NL'];
     
     for (const country of countries) {
@@ -107,7 +132,7 @@ describe('IBANForm Dropdown Interactions', () => {
         expect(countrySelect.value).toBe(country);
       });
 
-      // Ensure bank dropdown is still present and functional
+      // Verify bank dropdown maintains functionality throughout the sequence
       await waitFor(() => {
         const bankSelect = screen.getByLabelText(/bank/i) as HTMLSelectElement;
         expect(bankSelect).toBeDefined();
