@@ -46,10 +46,11 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
 
   // Cleanup on unmount
   useEffect(() => {
+    const timeoutRef = updateTimeoutRef.current;
     return () => {
       isMountedRef.current = false;
-      if (updateTimeoutRef.current) {
-        clearTimeout(updateTimeoutRef.current);
+      if (timeoutRef) {
+        clearTimeout(timeoutRef);
       }
     };
   }, []);
