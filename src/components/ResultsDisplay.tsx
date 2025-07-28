@@ -5,14 +5,59 @@ import { formatIBAN } from '../utils/ibanGenerator';
 interface ResultsDisplayProps {
   results: string[];
   country: string;
+  onClear?: () => void;
 }
 
-export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country }) => {
+export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country, onClear }) => {
   const { t } = useTranslation();
   const [copyMessage, setCopyMessage] = useState('');
   const [copyTimeout, setCopyTimeout] = useState<number | null>(null);
 
   if (results.length === 0) return null;
+
+  const handleCopyAll = async () => {
+    const allIbans = results.join('\n');
+    
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(allIbans);
+      } else {
+        throw new Error('Clipboard copying is not supported in this browser.');
+      }
+      
+      setCopyMessage(t('results.copySuccess'));
+      
+      if (copyTimeout) {
+        clearTimeout(copyTimeout);
+      }
+      
+      const timeout = window.setTimeout(() => {
+        setCopyMessage('');
+      }, 3000);
+      
+      setCopyTimeout(timeout);
+      
+    } catch (err) {
+      console.error('Copy failed:', err);
+      setCopyMessage('Copy failed');
+      
+      if (copyTimeout) {
+        clearTimeout(copyTimeout);
+      }
+      
+      const timeout = window.setTimeout(() => {
+        setCopyMessage('');
+      }, 3000);
+      
+      setCopyTimeout(timeout);
+    }
+  };
+
+  const handleClear = () => {
+    if (onClear) {
+      onClear();
+    }
+  };
 
   const handleCopy = async (iban: string) => {
     const ibanRaw = iban.replace(/\s/g, '');
@@ -55,20 +100,35 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = (format: 'txt' | 'csv' = 'txt') => {
     try {
-      const text = results.join('\n');
-      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      let content: string;
+      let mimeType: string;
+      let extension: string;
+
+      if (format === 'csv') {
+        // Create CSV with header
+        content = 'IBAN\n' + results.join('\n');
+        mimeType = 'text/csv;charset=utf-8';
+        extension = 'csv';
+      } else {
+        // Plain text format
+        content = results.join('\n');
+        mimeType = 'text/plain;charset=utf-8';
+        extension = 'txt';
+      }
+
+      const blob = new Blob([content], { type: mimeType });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `iban-results-${country}-${results.length}.txt`;
+      link.download = `iban-results-${country}-${results.length}.${extension}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (e) {
-      console.error('Error downloading bulk IBAN results:', e);
+      console.error('Error downloading IBAN results:', e);
     }
   };
 
@@ -120,6 +180,16 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
               </p>
             )}
           </div>
+          <div className="form-group button-group">
+            <button 
+              type="button" 
+              className="btn btn-secondary"
+              onClick={handleClear}
+              aria-label={t('results.clearResults')}
+            >
+              {t('results.clearResults')}
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -150,12 +220,42 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
         <div className="form-group button-group">
           <button 
             type="button" 
+            className="btn btn-primary"
+            onClick={handleCopyAll}
+            aria-label={t('results.copyAll')}
+          >
+            {t('results.copyAll')}
+          </button>
+          <button 
+            type="button" 
             className="btn btn-secondary download-bulk"
-            onClick={handleDownload}
+            onClick={() => handleDownload('txt')}
+            aria-label={t('results.download')}
           >
             {t('results.download')}
           </button>
+          <button 
+            type="button" 
+            className="btn btn-secondary download-bulk"
+            onClick={() => handleDownload('csv')}
+            aria-label={t('results.downloadCsv')}
+          >
+            {t('results.downloadCsv')}
+          </button>
+          <button 
+            type="button" 
+            className="btn btn-secondary"
+            onClick={handleClear}
+            aria-label={t('results.clearResults')}
+          >
+            {t('results.clearResults')}
+          </button>
         </div>
+        {copyMessage && (
+          <p className="copy-message" role="status" aria-live="polite">
+            {copyMessage}
+          </p>
+        )}
       </div>
     </div>
   );
