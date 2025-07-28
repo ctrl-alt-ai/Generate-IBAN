@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- REMOVED STRICT CSP FOR TESTING -->
+    <title>IBAN Generator | Open Source - Safe Mode</title>
+    <meta
+      name="description"
+      content="Generate valid IBAN numbers for testing purposes. Open source."
+    />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <!-- PWA manifest -->
+    <link rel="manifest" href="/Generate-IBAN/manifest.json" />
+    <meta name="theme-color" content="#2563eb" />
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root">
+      <div style="padding: 20px; text-align: center; color: #666;">
+        <p>🔄 Loading React application...</p>
+        <p>If this message persists, check the browser console for JavaScript errors.</p>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <script>
+      // Debug script to check if React is loading
+      console.log('=== DOM DEBUG ===');
+      console.log('Initial root content:', document.getElementById('root').innerHTML);
+      
+      // Check after a delay if React has rendered
+      setTimeout(() => {
+        console.log('After 2 seconds - root content:', document.getElementById('root').innerHTML);
+        const rootHasContent = document.getElementById('root').children.length > 1;
+        console.log('React appears to have rendered:', rootHasContent);
+        
+        if (!rootHasContent) {
+          console.error('❌ React has NOT rendered after 2 seconds!');
+          console.log('Check for JavaScript errors above this message.');
+        } else {
+          console.log('✅ React has successfully rendered!');
+        }
+      }, 2000);
+      
+      // Listen for any JavaScript errors
+      window.addEventListener('error', (e) => {
+        console.error('❌ JavaScript Error:', e.error);
+        console.log('This error might prevent React from rendering');
+      });
+      
+      window.addEventListener('unhandledrejection', (e) => {
+        console.error('❌ Unhandled Promise Rejection:', e.reason);
+        console.log('This error might prevent React from rendering');
+      });
+    </script>
+  </body>
+</html>
