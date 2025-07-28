@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => ({
   },
   server: {
     headers: {
-      // Development CSP - Allows Vite HMR and dev tools
+      // Development CSP - Allows dev tools and HMR
       'Content-Security-Policy': mode === 'development' 
         ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' ws: wss: http://localhost:* https://localhost:*; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; worker-src 'self' blob:;"
         : undefined
