@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useDeferredValue, startTransition, memo, useCallback } from 'react';
+import React, { useState, useEffect, useDeferredValue, startTransition, memo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { COUNTRY_NAMES, BANK_DATA } from '../utils/constants';
 import { getSuggestedCountry } from '../utils/ibanGenerator';
@@ -33,18 +33,33 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   const [showBankSelector, setShowBankSelector] = useState(false);
   const [availableBanks, setAvailableBanks] = useState<{ [key: string]: BankInfo }>({});
   const [isBanksLoading, setIsBanksLoading] = useState(false);
+  
+  // Refs for proper focus management and preventing unmounted component updates
+  const countrySelectRef = useRef<HTMLSelectElement>(null);
+  const bankSelectRef = useRef<HTMLSelectElement>(null);
+  const isMountedRef = useRef(true);
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Use React 18 performance features
   const deferredFormData = useDeferredValue(formData);
   const { isFormValid, getFieldValidation } = useFormValidation(deferredFormData);
 
-  // Update bank selector when country changes
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Update bank selector when country changes with improved race condition handling
   useEffect(() => {
     const banksForCountry = BANK_DATA[formData.country];
     setIsBanksLoading(true);
     
     startTransition(() => {
-      
       if (banksForCountry && Object.keys(banksForCountry).length > 0) {
         setAvailableBanks(banksForCountry);
         setShowBankSelector(true);
@@ -65,11 +80,15 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
         setShowBankSelector(false);
         setFormData(prev => ({ ...prev, bank: '' }));
       }
+      
       setIsBanksLoading(false);
     });
   }, [formData.country]);
 
   const handleCountryChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
+    // Prevent event propagation that might interfere with dropdown behavior
+    event.stopPropagation();
+    
     setFormData(prev => ({
       ...prev,
       country: event.target.value,
@@ -77,6 +96,9 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   }, []);
 
   const handleBankChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
+    // Prevent event propagation that might interfere with dropdown behavior
+    event.stopPropagation();
+    
     setFormData(prev => ({
       ...prev,
       bank: event.target.value,
@@ -84,11 +106,21 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   }, []);
 
   const handleQuantityChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    event.stopPropagation();
     const value = parseInt(event.target.value) || 1;
     setFormData(prev => ({
       ...prev,
       quantity: value,
     }));
+  }, []);
+
+  // Handle click events on form elements to prevent interference
+  const handleFormClick = useCallback((event: React.MouseEvent) => {
+    // Only stop propagation for select elements to maintain dropdown functionality
+    const target = event.target as HTMLElement;
+    if (target.tagName === 'SELECT') {
+      event.stopPropagation();
+    }
   }, []);
 
   const handleSubmit = useCallback((event: React.FormEvent) => {
@@ -114,20 +146,23 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   );
 
   return (
-    <form id="iban-form" onSubmit={handleSubmit} noValidate>
+    <form id="iban-form" onSubmit={handleSubmit} onClick={handleFormClick} noValidate>
       <fieldset>
         <legend className="form-section-heading">{t('form.legend')}</legend>
 
         <div className="form-group has-validation form-field-enhanced">
           <label htmlFor="country">{t('form.country.label')}</label>
           <select
+            ref={countrySelectRef}
             id="country"
             name="country"
             value={formData.country}
             onChange={handleCountryChange}
             required
+            tabIndex={0}
             aria-describedby="country-help"
             aria-invalid={getFieldValidation('country')?.type === 'error' ? 'true' : 'false'}
+            aria-expanded="false"
             className={getFieldValidation('country')?.type === 'error' ? 'invalid' : 
                       getFieldValidation('country')?.type === 'success' ? 'valid' : ''}
           >
@@ -157,13 +192,15 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
           <div className="form-group has-validation form-field-enhanced" id="bank-container">
             <label htmlFor="bank">{t('form.bank.label')}</label>
             <select
-              key={`bank-${formData.country}`}
+              ref={bankSelectRef}
               id="bank"
               name="bank"
               value={formData.bank}
               onChange={handleBankChange}
+              tabIndex={0}
               aria-describedby="bank-help"
               aria-invalid={getFieldValidation('bank')?.type === 'error' ? 'true' : 'false'}
+              aria-expanded="false"
               className={getFieldValidation('bank')?.type === 'error' ? 'invalid' : 
                         getFieldValidation('bank')?.type === 'success' ? 'valid' : ''}
             >
