@@ -5,7 +5,7 @@ import { IBANForm } from '../../components/IBANForm';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../../i18n';
 
-// Mock the constants to avoid external dependencies
+// Mock the constants to avoid external dependencies and ensure predictable test data
 jest.mock('../../utils/constants', () => ({
   COUNTRY_NAMES: {
     'NL': 'Netherlands',

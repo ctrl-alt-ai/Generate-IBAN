@@ -44,7 +44,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   const deferredFormData = useDeferredValue(formData);
   const { isFormValid, getFieldValidation } = useFormValidation(deferredFormData);
 
-  // Cleanup on unmount
+  // Cleanup on unmount to prevent memory leaks
   useEffect(() => {
     const timeoutRef = updateTimeoutRef.current;
     return () => {
@@ -65,7 +65,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
         setAvailableBanks(banksForCountry);
         setShowBankSelector(true);
         
-        // Always select first available bank as default, unless current bank is still valid
+        // Preserve current bank selection if still valid for new country, otherwise select first available
         setFormData(prev => {
           const currentBank = prev.bank;
           const isCurrentBankValid = currentBank && banksForCountry[currentBank];
@@ -77,6 +77,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
           };
         });
       } else {
+        // No banks available for selected country - hide bank selector and clear selection
         setAvailableBanks({});
         setShowBankSelector(false);
         setFormData(prev => ({ ...prev, bank: '' }));
@@ -107,6 +108,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   }, []);
 
   const handleQuantityChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    // Prevent event propagation that might interfere with form behavior
     event.stopPropagation();
     const value = parseInt(event.target.value) || 1;
     setFormData(prev => ({
@@ -131,7 +133,6 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
     }
   }, [isFormValid, isGenerating, onGenerate, deferredFormData]);
 
-
   // Memoized sorted countries to prevent unnecessary re-renders
   const sortedCountries = React.useMemo(() => {
     return countryGeneratorFactory.getAvailableCountries().sort((a: string, b: string) =>
@@ -139,7 +140,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
     );
   }, []);
 
-  // Memoized sorted banks
+  // Memoized sorted banks to optimize rendering performance
   const sortedBanks = React.useMemo(() => 
     Object.entries(availableBanks).sort((a, b) =>
       (a[1].name || a[0]).localeCompare(b[1].name || b[0])
