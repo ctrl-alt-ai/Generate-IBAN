@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM Debug Test</title>
+</head>
+<body>
+    <div id="root">
+        <a href="#main-content" class="skip-link">Ga naar hoofdinhoud</a>
+        <main id="main-content">
+            <div class="container">
+                <header role="banner">
+                    <div class="header-content">
+                        <div class="title-section">
+                            <h1>IBAN Generator</h1>
+                            <p class="subtitle">Genereer geldige IBAN-nummers voor testdoeleinden</p>
+                        </div>
+                    </div>
+                </header>
+                <div class="card">
+                    <form id="iban-form" novalidate="">
+                        <fieldset>
+                            <legend class="form-section-heading">Generator Instellingen</legend>
+                            <div class="form-group has-validation form-field-enhanced">
+                                <label for="country">Land:</label>
+                                <select id="country" name="country" required="" aria-describedby="country-help">
+                                    <option value="NL">Netherlands</option>
+                                    <option value="DE">Germany</option>
+                                    <option value="FR">France</option>
+                                </select>
+                                <p id="country-help" class="help-text">Selecteer het land voor de IBAN</p>
+                            </div>
+                            <div class="form-group has-validation form-field-enhanced">
+                                <label for="bank">Bank:</label>
+                                <select id="bank" name="bank" aria-describedby="bank-help">
+                                    <option value="ABNA">ABN AMRO</option>
+                                    <option value="INGB">ING Bank</option>
+                                    <option value="RABO">Rabobank</option>
+                                </select>
+                                <p id="bank-help" class="help-text">Optioneel: Selecteer een bank voor Netherlands</p>
+                            </div>
+                            <div class="form-group has-validation form-field-enhanced">
+                                <label for="quantity">Aantal te genereren IBANs:</label>
+                                <input type="number" id="quantity" name="quantity" value="1" min="1" max="100" required="">
+                                <p class="help-text">Voer een getal tussen 1 en 100 in</p>
+                            </div>
+                            <button type="submit" class="generate-btn">Genereer IBAN(s)</button>
+                        </fieldset>
+                    </form>
+                    <div class="results-section">
+                        <h2>Gegenereerde IBANs</h2>
+                        <div class="iban-result">
+                            <span class="iban-number">NL91 ABNA 0417 1643 00</span>
+                            <button class="copy-btn" title="Kopieer naar klembord">📋</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        console.log('DOM is volledig geladen!');
+        console.log('Root element:', document.getElementById('root'));
+        console.log('Alle elementen in root:', document.getElementById('root').children);
+    </script>
+</body>
+</html>
