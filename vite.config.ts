@@ -10,10 +10,20 @@ export default defineConfig(({ mode }) => ({
   },
   server: {
     headers: {
-      // Relaxed CSP for development to allow dev tools
+      // Development CSP - Allows Vite HMR and dev tools
       'Content-Security-Policy': mode === 'development' 
-        ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' ws: wss:; img-src 'self' data:; object-src 'none';"
+        ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' ws: wss: http://localhost:* https://localhost:*; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; worker-src 'self' blob:;"
         : undefined
+    }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          i18n: ['i18next', 'react-i18next', 'i18next-browser-languagedetector']
+        }
+      }
     }
   }
 }))

@@ -1,6 +1,6 @@
 // CSP Configuration for different environments
 export const CSP_POLICIES = {
-  // Production CSP - Maximum security for live site
+  // Production CSP - Secure but allows web inspector to work
   production: [
     "default-src 'self'",
     "script-src 'self'",
@@ -11,9 +11,7 @@ export const CSP_POLICIES = {
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-    "frame-ancestors 'none'",
-    "upgrade-insecure-requests",
-    "block-all-mixed-content"
+    "frame-ancestors 'none'"
   ].join('; '),
 
   // Development CSP - Optimized for debugging and dev tools
@@ -53,22 +51,26 @@ export function updateCSP() {
                       localStorage.getItem('csp-debug') === 'true';
   const cspMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]') as HTMLMetaElement;
   
-  if (!cspMeta) return;
+  if (!cspMeta) {
+    console.warn('No CSP meta tag found - CSP will not be updated');
+    return;
+  }
 
-  if (isDebugMode && isDevelopment) {
-    // Ultra permissive for debugging
+  if (isDebugMode) {
+    // Ultra permissive for debugging (works in both dev and production)
     cspMeta.content = CSP_POLICIES.debug;
     console.warn('🚨 DEBUG CSP applied - Ultra permissive mode! Use only for debugging.');
     console.info('💡 To disable: localStorage.removeItem("csp-debug") or remove ?debug from URL');
   } else if (isDevelopment) {
-    // Development CSP - balanced
+    // Development CSP - balanced for dev tools
     cspMeta.content = CSP_POLICIES.development;
     console.info('🔓 Development CSP applied - Dev tools enabled');
     console.info('💡 For ultra-permissive debugging: add ?debug to URL or run enableDebugCSP()');
   } else {
-    // Production CSP - maximum security
+    // Production CSP - secure but allows web inspector
     cspMeta.content = CSP_POLICIES.production;
-    console.info('🔒 Production CSP applied - Maximum security');
+    console.info('🔒 Production CSP applied - Secure with web inspector support');
+    console.info('💡 For debugging production issues: add ?debug to URL');
   }
 }
 
@@ -81,31 +83,33 @@ declare global {
   }
 }
 
-// Expert debugging utilities
-if (import.meta.env.DEV) {
-  window.enableDebugCSP = () => {
-    localStorage.setItem('csp-debug', 'true');
-    location.reload();
-  };
+// Debug utilities - Available in both development and production
+window.enableDebugCSP = () => {
+  localStorage.setItem('csp-debug', 'true');
+  console.log('🔓 Debug CSP will be enabled on next page load');
+  location.reload();
+};
 
-  window.disableDebugCSP = () => {
-    localStorage.removeItem('csp-debug');
-    location.reload();
-  };
+window.disableDebugCSP = () => {
+  localStorage.removeItem('csp-debug');
+  console.log('🔒 Debug CSP disabled - returning to normal CSP on next page load');
+  location.reload();
+};
 
-  window.showCSPInfo = () => {
-    const cspMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]') as HTMLMetaElement;
-    console.group('🔍 Current CSP Configuration');
-    console.log('Policy:', cspMeta?.content || 'No CSP found');
-    console.log('Environment:', import.meta.env.DEV ? 'Development' : 'Production');
-    console.log('Debug Mode:', localStorage.getItem('csp-debug') === 'true');
-    console.groupEnd();
-  };
-
-  // Show available debug commands
-  console.group('🛠️ CSP Debug Commands Available');
-  console.log('enableDebugCSP() - Enable ultra-permissive CSP');
-  console.log('disableDebugCSP() - Disable debug CSP');
-  console.log('showCSPInfo() - Show current CSP details');
+window.showCSPInfo = () => {
+  const cspMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]') as HTMLMetaElement;
+  console.group('🔍 Current CSP Configuration');
+  console.log('Policy:', cspMeta?.content || 'No CSP found');
+  console.log('Environment:', import.meta.env.DEV ? 'Development' : 'Production');
+  console.log('Debug Mode:', localStorage.getItem('csp-debug') === 'true');
+  console.log('URL Debug:', new URLSearchParams(window.location.search).has('debug'));
   console.groupEnd();
-}
+};
+
+// Show available debug commands (always available for production debugging)
+console.group('🛠️ CSP Debug Commands Available');
+console.log('enableDebugCSP() - Enable ultra-permissive CSP for debugging');
+console.log('disableDebugCSP() - Disable debug CSP');
+console.log('showCSPInfo() - Show current CSP details');
+console.log('💡 You can also add ?debug to the URL for temporary debug mode');
+console.groupEnd();
