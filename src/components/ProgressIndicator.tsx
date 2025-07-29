@@ -30,7 +30,7 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
         <div 
           className="progress-fill" 
           style={{ width: `${percentage}%` }}
-          aria-valuenow={percentage}
+          aria-valuenow={current}
           aria-valuemin={0}
           aria-valuemax={100}
           role="progressbar"
