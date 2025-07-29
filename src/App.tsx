@@ -76,7 +76,7 @@ function App() {
           setProgress({ current: i + 1, total: data.quantity });
           // Add small delay to improve UI responsiveness for large quantities
           if (i % 10 === 0 && i > 0 && !cancellationRef.current) {
-            await new Promise(resolve => requestAnimationFrame(resolve));
+            await new Promise(resolve => setTimeout(resolve, 1));
           }
         }
       }
