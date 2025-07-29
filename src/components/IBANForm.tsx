@@ -51,19 +51,23 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   const countrySelectRef = useRef<HTMLSelectElement>(null);
   const bankSelectRef = useRef<HTMLSelectElement>(null);
   const isMountedRef = useRef(true);
+  
+  // 🐛 FIX: Properly manage update timeout reference
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // React 18 performance optimizations: deferred values and concurrent features
   const deferredFormData = useDeferredValue(formData);
   const { isFormValid, getFieldValidation } = useFormValidation(deferredFormData);
 
-  // Cleanup on unmount to prevent memory leaks
+  // 🐛 FIX: Proper cleanup on unmount to prevent memory leaks and race conditions
   useEffect(() => {
-    const timeoutRef = updateTimeoutRef.current;
+    isMountedRef.current = true;
+    
     return () => {
       isMountedRef.current = false;
-      if (timeoutRef) {
-        clearTimeout(timeoutRef);
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+        updateTimeoutRef.current = null;
       }
     };
   }, []);
@@ -71,35 +75,49 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
   // Dynamic bank loading effect: updates available banks when country changes
   // Uses startTransition for improved UX during rapid country switching
   useEffect(() => {
+    // 🐛 FIX: Clear any pending timeout before starting new bank loading
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+      updateTimeoutRef.current = null;
+    }
+
     const banksForCountry = BANK_DATA[formData.country];
     setIsBanksLoading(true);
     
-    // Wrap state updates in startTransition to prevent blocking UI updates
-    startTransition(() => {
-      if (banksForCountry && Object.keys(banksForCountry).length > 0) {
-        setAvailableBanks(banksForCountry);
-        setShowBankSelector(true);
-        
-        // Smart bank selection: preserve current selection if valid, otherwise pick first available
-        setFormData(prev => {
-          const currentBank = prev.bank;
-          const isCurrentBankValid = currentBank && banksForCountry[currentBank];
-          const firstBankKey = Object.keys(banksForCountry)[0];
-          
-          return {
-            ...prev,
-            bank: isCurrentBankValid ? currentBank : firstBankKey
-          };
-        });
-      } else {
-        // Handle countries without specific bank data
-        setAvailableBanks({});
-        setShowBankSelector(false);
-        setFormData(prev => ({ ...prev, bank: '' }));
-      }
+    // 🐛 FIX: Use timeout to prevent race conditions during rapid country switching
+    updateTimeoutRef.current = setTimeout(() => {
+      // Check if component is still mounted before updating state
+      if (!isMountedRef.current) return;
       
-      setIsBanksLoading(false);
-    });
+      // Wrap state updates in startTransition to prevent blocking UI updates
+      startTransition(() => {
+        if (banksForCountry && Object.keys(banksForCountry).length > 0) {
+          setAvailableBanks(banksForCountry);
+          setShowBankSelector(true);
+          
+          // Smart bank selection: preserve current selection if valid, otherwise pick first available
+          setFormData(prev => {
+            const currentBank = prev.bank;
+            const isCurrentBankValid = currentBank && banksForCountry[currentBank];
+            const firstBankKey = Object.keys(banksForCountry)[0];
+            
+            return {
+              ...prev,
+              bank: isCurrentBankValid ? currentBank : firstBankKey
+            };
+          });
+        } else {
+          // Handle countries without specific bank data
+          setAvailableBanks({});
+          setShowBankSelector(false);
+          setFormData(prev => ({ ...prev, bank: '' }));
+        }
+        
+        setIsBanksLoading(false);
+        updateTimeoutRef.current = null; // Clear reference after completion
+      });
+    }, 100); // Small delay to debounce rapid changes
+
   }, [formData.country]);
 
   const handleCountryChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
