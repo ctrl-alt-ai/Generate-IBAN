@@ -135,7 +135,9 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
       if (format === 'csv') {
         // Create CSV with enhanced header and metadata
         const generatedAt = new Date().toISOString();
-        content = 'IBAN,Country,Generated At\n' + results.map(iban => `${iban},${country},${generatedAt}`).join('\n');
+        content = 'IBAN,Country,Generated At\n' + results.map(iban => 
+          `"${iban.replace(/"/g, '""')}","${country.replace(/"/g, '""')}","${generatedAt.replace(/"/g, '""')}"`
+        ).join('\n');
         mimeType = 'text/csv;charset=utf-8';
         extension = 'csv';
       } else {
