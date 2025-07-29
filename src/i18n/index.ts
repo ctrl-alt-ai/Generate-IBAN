@@ -54,8 +54,11 @@ const resources = {
         copyAll: 'Copy All',
         clearResults: 'Clear Results',
         copySuccess: 'Copied to clipboard!',
+        copyFailed: 'Failed to copy to clipboard',
+        clipboardNotSupported: 'Clipboard copying is not supported in this browser',
         copyButton: 'Copy IBAN',
-        generating: 'Generating IBANs...'
+        generating: 'Generating IBANs...',
+        complete: 'Generation complete'
       },
       
       // Error messages
@@ -119,8 +122,11 @@ const resources = {
         copyAll: 'Alles Kopiëren',
         clearResults: 'Resultaten Wissen',
         copySuccess: 'Gekopieerd!',
+        copyFailed: 'Kopiëren mislukt',
+        clipboardNotSupported: 'Kopiëren naar klembord wordt niet ondersteund in deze browser',
         copyButton: 'Kopieer IBAN',
-        generating: 'IBANs genereren...'
+        generating: 'IBANs genereren...',
+        complete: 'Genereren voltooid'
       },
       
       // Error messages
@@ -184,8 +190,11 @@ const resources = {
         copyAll: 'Alle Kopieren',
         clearResults: 'Ergebnisse Löschen',
         copySuccess: 'In die Zwischenablage kopiert!',
+        copyFailed: 'Kopieren fehlgeschlagen',
+        clipboardNotSupported: 'Kopieren in die Zwischenablage wird in diesem Browser nicht unterstützt',
         copyButton: 'IBAN kopieren',
-        generating: 'IBANs generieren...'
+        generating: 'IBANs generieren...',
+        complete: 'Generierung abgeschlossen'
       },
       
       // Error messages

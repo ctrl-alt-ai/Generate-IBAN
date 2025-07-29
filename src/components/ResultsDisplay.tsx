@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatIBAN } from '../utils/ibanGenerator';
 
@@ -13,6 +13,15 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
   const [copyMessage, setCopyMessage] = useState('');
   const [copyTimeout, setCopyTimeout] = useState<number | null>(null);
 
+  // Cleanup timeout on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (copyTimeout) {
+        clearTimeout(copyTimeout);
+      }
+    };
+  }, [copyTimeout]);
+
   if (results.length === 0) return null;
 
   const handleCopyAll = async () => {
@@ -21,7 +30,19 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(allIbans);
+        setCopyMessage(t('results.copySuccess'));
+        
+        if (copyTimeout) {
+          clearTimeout(copyTimeout);
+        }
+        
+        const timeout = window.setTimeout(() => {
+          setCopyMessage('');
+        }, 3000);
+        
+        setCopyTimeout(timeout);
       } else {
+        // Clipboard API not supported
         setCopyMessage(t('results.clipboardNotSupported'));
         
         if (copyTimeout) {
@@ -34,19 +55,6 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
         
         setCopyTimeout(timeout);
       }
-      
-      setCopyMessage(t('results.copySuccess'));
-      
-      if (copyTimeout) {
-        clearTimeout(copyTimeout);
-      }
-      
-      const timeout = window.setTimeout(() => {
-        setCopyMessage('');
-      }, 3000);
-      
-      setCopyTimeout(timeout);
-      
     } catch (err) {
       console.error('Copy failed:', err);
       setCopyMessage(t('results.copyFailed'));
@@ -75,28 +83,36 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(ibanRaw);
+        setCopyMessage(t('results.copySuccess'));
+        
+        // Clear previous timeout
+        if (copyTimeout) {
+          clearTimeout(copyTimeout);
+        }
+        
+        // Set new timeout
+        const timeout = window.setTimeout(() => {
+          setCopyMessage('');
+        }, 3000);
+        
+        setCopyTimeout(timeout);
       } else {
         // Clipboard API not supported
-        throw new Error('Clipboard copying is not supported in this browser. Please manually select and copy the IBAN.');
+        setCopyMessage(t('results.clipboardNotSupported'));
+        
+        if (copyTimeout) {
+          clearTimeout(copyTimeout);
+        }
+        
+        const timeout = window.setTimeout(() => {
+          setCopyMessage('');
+        }, 3000);
+        
+        setCopyTimeout(timeout);
       }
-      
-      setCopyMessage(t('results.copySuccess'));
-      
-      // Clear previous timeout
-      if (copyTimeout) {
-        clearTimeout(copyTimeout);
-      }
-      
-      // Set new timeout
-      const timeout = window.setTimeout(() => {
-        setCopyMessage('');
-      }, 3000);
-      
-      setCopyTimeout(timeout);
-      
     } catch (err) {
       console.error('Copy failed:', err);
-      setCopyMessage('Copy failed');
+      setCopyMessage(t('results.copyFailed'));
       
       if (copyTimeout) {
         clearTimeout(copyTimeout);
