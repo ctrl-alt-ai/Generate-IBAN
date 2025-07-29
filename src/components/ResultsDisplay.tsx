@@ -1,81 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatIBAN } from '../utils/ibanGenerator';
 
 interface ResultsDisplayProps {
   results: string[];
   country: string;
-  onClear?: () => void;
 }
 
-export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country, onClear }) => {
+export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country }) => {
   const { t } = useTranslation();
   const [copyMessage, setCopyMessage] = useState('');
   const [copyTimeout, setCopyTimeout] = useState<number | null>(null);
 
-  // Cleanup timeout on unmount to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      if (copyTimeout) {
-        clearTimeout(copyTimeout);
-      }
-    };
-  }, [copyTimeout]);
-
   if (results.length === 0) return null;
-
-  const handleCopyAll = async () => {
-    const allIbans = results.join('\n');
-    
-    try {
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(allIbans);
-        setCopyMessage(t('results.copySuccess'));
-        
-        if (copyTimeout) {
-          clearTimeout(copyTimeout);
-        }
-        
-        const timeout = window.setTimeout(() => {
-          setCopyMessage('');
-        }, 3000);
-        
-        setCopyTimeout(timeout);
-      } else {
-        // Clipboard API not supported
-        setCopyMessage(t('results.clipboardNotSupported'));
-        
-        if (copyTimeout) {
-          clearTimeout(copyTimeout);
-        }
-        
-        const timeout = window.setTimeout(() => {
-          setCopyMessage('');
-        }, 3000);
-        
-        setCopyTimeout(timeout);
-      }
-    } catch (err) {
-      console.error('Copy failed:', err);
-      setCopyMessage(t('results.copyFailed'));
-      
-      if (copyTimeout) {
-        clearTimeout(copyTimeout);
-      }
-      
-      const timeout = window.setTimeout(() => {
-        setCopyMessage('');
-      }, 3000);
-      
-      setCopyTimeout(timeout);
-    }
-  };
-
-  const handleClear = () => {
-    if (onClear) {
-      onClear();
-    }
-  };
 
   const handleCopy = async (iban: string) => {
     const ibanRaw = iban.replace(/\s/g, '');
@@ -83,36 +20,28 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(ibanRaw);
-        setCopyMessage(t('results.copySuccess'));
-        
-        // Clear previous timeout
-        if (copyTimeout) {
-          clearTimeout(copyTimeout);
-        }
-        
-        // Set new timeout
-        const timeout = window.setTimeout(() => {
-          setCopyMessage('');
-        }, 3000);
-        
-        setCopyTimeout(timeout);
       } else {
         // Clipboard API not supported
-        setCopyMessage(t('results.clipboardNotSupported'));
-        
-        if (copyTimeout) {
-          clearTimeout(copyTimeout);
-        }
-        
-        const timeout = window.setTimeout(() => {
-          setCopyMessage('');
-        }, 3000);
-        
-        setCopyTimeout(timeout);
+        throw new Error('Clipboard copying is not supported in this browser. Please manually select and copy the IBAN.');
       }
+      
+      setCopyMessage(t('results.copySuccess'));
+      
+      // Clear previous timeout
+      if (copyTimeout) {
+        clearTimeout(copyTimeout);
+      }
+      
+      // Set new timeout
+      const timeout = window.setTimeout(() => {
+        setCopyMessage('');
+      }, 3000);
+      
+      setCopyTimeout(timeout);
+      
     } catch (err) {
       console.error('Copy failed:', err);
-      setCopyMessage(t('results.copyFailed'));
+      setCopyMessage('Copy failed');
       
       if (copyTimeout) {
         clearTimeout(copyTimeout);
@@ -126,38 +55,20 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
     }
   };
 
-  const handleDownload = (format: 'txt' | 'csv' = 'txt') => {
+  const handleDownload = () => {
     try {
-      let content: string;
-      let mimeType: string;
-      let extension: string;
-
-      if (format === 'csv') {
-        // Create CSV with enhanced header and metadata
-        const generatedAt = new Date().toISOString();
-        content = 'IBAN,Country,Generated At\n' + results.map(iban => 
-          `"${iban.replace(/"/g, '""')}","${country.replace(/"/g, '""')}","${generatedAt.replace(/"/g, '""')}"`
-        ).join('\n');
-        mimeType = 'text/csv;charset=utf-8';
-        extension = 'csv';
-      } else {
-        // Plain text format
-        content = results.join('\n');
-        mimeType = 'text/plain;charset=utf-8';
-        extension = 'txt';
-      }
-
-      const blob = new Blob([content], { type: mimeType });
+      const text = results.join('\n');
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `iban-results-${country}-${results.length}.${extension}`;
+      link.download = `iban-results-${country}-${results.length}.txt`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (e) {
-      console.error('Error downloading IBAN results:', e);
+      console.error('Error downloading bulk IBAN results:', e);
     }
   };
 
@@ -209,16 +120,6 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
               </p>
             )}
           </div>
-          <div className="form-group button-group">
-            <button 
-              type="button" 
-              className="btn btn-secondary"
-              onClick={handleClear}
-              aria-label={t('results.clearResults')}
-            >
-              {t('results.clearResults')}
-            </button>
-          </div>
         </div>
       </div>
     );
@@ -249,42 +150,12 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
         <div className="form-group button-group">
           <button 
             type="button" 
-            className="btn btn-primary"
-            onClick={handleCopyAll}
-            aria-label={t('results.copyAll')}
-          >
-            {t('results.copyAll')}
-          </button>
-          <button 
-            type="button" 
             className="btn btn-secondary download-bulk"
-            onClick={() => handleDownload('txt')}
-            aria-label={t('results.download')}
+            onClick={handleDownload}
           >
             {t('results.download')}
           </button>
-          <button 
-            type="button" 
-            className="btn btn-secondary download-bulk"
-            onClick={() => handleDownload('csv')}
-            aria-label={t('results.downloadCsv')}
-          >
-            {t('results.downloadCsv')}
-          </button>
-          <button 
-            type="button" 
-            className="btn btn-secondary"
-            onClick={handleClear}
-            aria-label={t('results.clearResults')}
-          >
-            {t('results.clearResults')}
-          </button>
         </div>
-        {copyMessage && (
-          <p className="copy-message" role="status" aria-live="polite">
-            {copyMessage}
-          </p>
-        )}
       </div>
     </div>
   );

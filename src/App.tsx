@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IBANForm } from './components/IBANForm';
 import { ResultsDisplay } from './components/ResultsDisplay';
-import { ProgressIndicator } from './components/ProgressIndicator';
 import { generateIBAN } from './utils/ibanGenerator';
 import { BANK_DATA, COUNTRY_NAMES } from './utils/constants';
 import type { FormData } from './utils/types';
@@ -13,7 +12,6 @@ function App() {
   const [results, setResults] = useState<string[]>([]);
   const [currentCountry, setCurrentCountry] = useState<string>('NL');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [errors, setErrors] = useState<{
     country?: string;
     bank?: string;
@@ -47,11 +45,6 @@ function App() {
     }
 
     setIsGenerating(true);
-    const showProgress = data.quantity > 50;
-    
-    if (showProgress) {
-      setProgress({ current: 0, total: data.quantity });
-    }
 
     try {
       // Get bank info if selected
@@ -62,22 +55,13 @@ function App() {
       const newResults: string[] = [];
       let failures = 0;
 
-      // Generate IBANs with progress updates
+      // Generate IBANs
       for (let i = 0; i < data.quantity; i++) {
         const iban = generateIBAN(data.country, bankInfo);
         if (iban) {
           newResults.push(iban);
         } else {
           failures++;
-        }
-
-        // Update progress for large quantities
-        if (showProgress) {
-          setProgress({ current: i + 1, total: data.quantity });
-          // Add small delay to improve UI responsiveness for large quantities
-          if (i % 10 === 0 && i > 0 && !cancellationRef.current) {
-            await new Promise(resolve => setTimeout(resolve, 1));
-          }
         }
       }
 
@@ -101,13 +85,7 @@ function App() {
       });
     } finally {
       setIsGenerating(false);
-      setProgress({ current: 0, total: 0 });
     }
-  };
-
-  const handleClearResults = () => {
-    setResults([]);
-    setErrors({});
   };
 
   return (
@@ -139,16 +117,9 @@ function App() {
               errors={errors}
             />
 
-            <ProgressIndicator 
-              current={progress.current}
-              total={progress.total}
-              isVisible={isGenerating && progress.total > 50}
-            />
-
             <ResultsDisplay 
               results={results}
               country={currentCountry}
-              onClear={handleClearResults}
             />
           </div>
         </div>
