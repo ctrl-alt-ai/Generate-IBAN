@@ -22,7 +22,17 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(allIbans);
       } else {
-        throw new Error('Clipboard copying is not supported in this browser.');
+        setCopyMessage(t('results.clipboardNotSupported'));
+        
+        if (copyTimeout) {
+          clearTimeout(copyTimeout);
+        }
+        
+        const timeout = window.setTimeout(() => {
+          setCopyMessage('');
+        }, 3000);
+        
+        setCopyTimeout(timeout);
       }
       
       setCopyMessage(t('results.copySuccess'));
