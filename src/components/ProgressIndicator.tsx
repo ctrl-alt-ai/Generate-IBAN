@@ -19,7 +19,7 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
   const percentage = Math.round((current / total) * 100);
 
   return (
-    <div className="progress-container" role="status" aria-live="off">
+    <div className="progress-container" role="status" aria-live="polite">
       {current === total && (
         <div className="sr-only" aria-live="polite">
           {t('results.complete')}
