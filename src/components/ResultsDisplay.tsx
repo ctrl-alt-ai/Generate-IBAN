@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatIBAN } from '../utils/ibanGenerator';
 
@@ -12,6 +12,15 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
   const [copyMessage, setCopyMessage] = useState('');
   const [copyTimeout, setCopyTimeout] = useState<number | null>(null);
 
+  // 🐛 FIX: Cleanup timeout on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (copyTimeout) {
+        clearTimeout(copyTimeout);
+      }
+    };
+  }, [copyTimeout]);
+
   if (results.length === 0) return null;
 
   const handleCopy = async (iban: string) => {
@@ -21,20 +30,28 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(ibanRaw);
       } else {
-        // Clipboard API not supported
-        throw new Error('Clipboard copying is not supported in this browser. Please manually select and copy the IBAN.');
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = ibanRaw;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
       }
       
       setCopyMessage(t('results.copySuccess'));
       
-      // Clear previous timeout
+      // 🐛 FIX: Clear previous timeout properly before setting new one
       if (copyTimeout) {
         clearTimeout(copyTimeout);
       }
       
-      // Set new timeout
+      // Set new timeout and store reference
       const timeout = window.setTimeout(() => {
         setCopyMessage('');
+        setCopyTimeout(null); // Clear reference when timeout completes
       }, 3000);
       
       setCopyTimeout(timeout);
@@ -43,12 +60,14 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
       console.error('Copy failed:', err);
       setCopyMessage('Copy failed');
       
+      // 🐛 FIX: Same timeout cleanup for error case
       if (copyTimeout) {
         clearTimeout(copyTimeout);
       }
       
       const timeout = window.setTimeout(() => {
         setCopyMessage('');
+        setCopyTimeout(null);
       }, 3000);
       
       setCopyTimeout(timeout);
@@ -66,7 +85,9 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      
+      // 🐛 FIX: Cleanup object URL to prevent memory leaks
+      setTimeout(() => URL.revokeObjectURL(url), 100);
     } catch (e) {
       console.error('Error downloading bulk IBAN results:', e);
     }
