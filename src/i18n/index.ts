@@ -50,8 +50,15 @@ const resources = {
         heading: 'Generated IBANs ({{count}})',
         helpText: 'Generated IBANs, one per line.',
         download: 'Download Results (.txt)',
+        downloadCsv: 'Download Results (.csv)',
+        copyAll: 'Copy All',
+        clearResults: 'Clear Results',
         copySuccess: 'Copied to clipboard!',
-        copyButton: 'Copy IBAN'
+        copyFailed: 'Failed to copy to clipboard',
+        clipboardNotSupported: 'Clipboard copying is not supported in this browser',
+        copyButton: 'Copy IBAN',
+        generating: 'Generating IBANs...',
+        complete: 'Generation complete'
       },
       
       // Error messages
@@ -111,8 +118,15 @@ const resources = {
         heading: 'Gegenereerde IBANs ({{count}})',
         helpText: 'Gegenereerde IBANs, één per regel.',
         download: 'Download Resultaten (.txt)',
+        downloadCsv: 'Download Resultaten (.csv)',
+        copyAll: 'Alles Kopiëren',
+        clearResults: 'Resultaten Wissen',
         copySuccess: 'Gekopieerd!',
-        copyButton: 'Kopieer IBAN'
+        copyFailed: 'Kopiëren mislukt',
+        clipboardNotSupported: 'Kopiëren naar klembord wordt niet ondersteund in deze browser',
+        copyButton: 'Kopieer IBAN',
+        generating: 'IBANs genereren...',
+        complete: 'Genereren voltooid'
       },
       
       // Error messages
@@ -172,8 +186,15 @@ const resources = {
         heading: 'Generierte IBANs ({{count}})',
         helpText: 'Generierte IBANs, eine pro Zeile.',
         download: 'Ergebnisse herunterladen (.txt)',
+        downloadCsv: 'Ergebnisse herunterladen (.csv)',
+        copyAll: 'Alle Kopieren',
+        clearResults: 'Ergebnisse Löschen',
         copySuccess: 'In die Zwischenablage kopiert!',
-        copyButton: 'IBAN kopieren'
+        copyFailed: 'Kopieren fehlgeschlagen',
+        clipboardNotSupported: 'Kopieren in die Zwischenablage wird in diesem Browser nicht unterstützt',
+        copyButton: 'IBAN kopieren',
+        generating: 'IBANs generieren...',
+        complete: 'Generierung abgeschlossen'
       },
       
       // Error messages
