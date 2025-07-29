@@ -39,7 +39,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, country
       
     } catch (err) {
       console.error('Copy failed:', err);
-      setCopyMessage('Copy failed');
+      setCopyMessage(t('results.copyFailed'));
       
       if (copyTimeout) {
         clearTimeout(copyTimeout);
