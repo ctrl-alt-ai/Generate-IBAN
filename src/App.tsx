@@ -75,7 +75,7 @@ function App() {
         if (showProgress) {
           setProgress({ current: i + 1, total: data.quantity });
           // Add small delay to improve UI responsiveness for large quantities
-          if (i % 10 === 0 && i > 0 && isGenerating) {
+          if (i % 10 === 0 && i > 0 && !cancellationRef.current) {
             await new Promise(resolve => requestAnimationFrame(resolve));
           }
         }
