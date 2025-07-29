@@ -74,8 +74,8 @@ function App() {
         // Update progress for large quantities
         if (showProgress) {
           setProgress({ current: i + 1, total: data.quantity });
-          // Add small delay to show progress for large quantities
-          if (i % 10 === 0 && i > 0) {
+          // Add small delay to improve UI responsiveness for large quantities
+          if (i % 10 === 0 && i > 0 && isGenerating) {
             await new Promise(resolve => setTimeout(resolve, 10));
           }
         }
