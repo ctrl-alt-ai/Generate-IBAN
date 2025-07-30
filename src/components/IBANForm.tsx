@@ -1,4 +1,12 @@
-import React, { useState, useEffect, useDeferredValue, startTransition, memo, useCallback, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useDeferredValue,
+  startTransition,
+  memo,
+  useCallback,
+  useRef,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { COUNTRY_NAMES, BANK_DATA } from '../utils/constants';
 import { getSuggestedCountry } from '../utils/ibanGenerator';
@@ -7,6 +15,196 @@ import { useFormValidation } from '../hooks/useFormValidation';
 import { SkeletonLoader } from './SkeletonLoader';
 import { CountryGeneratorFactory } from '../generators/CountryGeneratorFactory';
 import type { BankInfo, FormData } from '../utils/types';
+import { sanitizeErrorMessage } from '../utils/sanitize';
+
+interface CountrySelectorProps {
+  sortedCountries: string[];
+  selectedCountry: string;
+  onChange: React.ChangeEventHandler<HTMLSelectElement>;
+  errors: { country?: string };
+  getFieldValidation: (field: string) => { type: string } | null;
+  t: (key: string, options?: any) => string;
+  countrySelectRef: React.RefObject<HTMLSelectElement>;
+}
+
+const CountrySelector = memo(
+  ({
+    sortedCountries,
+    selectedCountry,
+    onChange,
+    errors,
+    getFieldValidation,
+    t,
+    countrySelectRef,
+  }: CountrySelectorProps) => (
+    <div className="form-group has-validation form-field-enhanced">
+      <label htmlFor="country">{t('form.country.label')}</label>
+      <select
+        ref={countrySelectRef}
+        id="country"
+        name="country"
+        value={selectedCountry}
+        onChange={onChange}
+        required
+        tabIndex={0}
+        aria-describedby="country-help"
+        aria-invalid={getFieldValidation('country')?.type === 'error' ? 'true' : 'false'}
+        aria-expanded="false"
+        className={
+          getFieldValidation('country')?.type === 'error'
+            ? 'invalid'
+            : getFieldValidation('country')?.type === 'success'
+            ? 'valid'
+            : ''
+        }
+      >
+        {sortedCountries.map(countryCode => (
+          <option key={countryCode} value={countryCode}>
+            {COUNTRY_NAMES[countryCode] || countryCode}
+          </option>
+        ))}
+      </select>
+      <p id="country-help" className="help-text">
+        {t('form.country.help')}
+      </p>
+      {errors.country && (
+        <p className="error-message has-error" role="alert">
+          {errors.country}
+        </p>
+      )}
+    </div>
+  )
+);
+
+interface BankSelectorProps {
+  isBanksLoading: boolean;
+  showBankSelector: boolean;
+  sortedBanks: [string, BankInfo][];
+  selectedBank: string;
+  onChange: React.ChangeEventHandler<HTMLSelectElement>;
+  errors: { bank?: string };
+  getFieldValidation: (field: string) => { type: string } | null;
+  t: (key: string, options?: any) => string;
+  bankSelectRef: React.RefObject<HTMLSelectElement>;
+  selectedCountry: string;
+}
+
+const BankSelector = memo(
+  ({
+    isBanksLoading,
+    showBankSelector,
+    sortedBanks,
+    selectedBank,
+    onChange,
+    errors,
+    getFieldValidation,
+    t,
+    bankSelectRef,
+    selectedCountry,
+  }: BankSelectorProps) => {
+    if (isBanksLoading) {
+      return (
+        <div className="form-group">
+          <label>{t('form.bank.label')}</label>
+          <SkeletonLoader rows={1} />
+          <p className="help-text">{t('form.bank.loading')}</p>
+        </div>
+      );
+    }
+
+    if (!showBankSelector) {
+      return (
+        <div className="form-group">
+          <p className="help-text">
+            {t('form.bank.noSpecificBanks', {
+              country: COUNTRY_NAMES[selectedCountry] || selectedCountry,
+            })}
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="form-group has-validation form-field-enhanced" id="bank-container">
+        <label htmlFor="bank">{t('form.bank.label')}</label>
+        <select
+          ref={bankSelectRef}
+          id="bank"
+          name="bank"
+          value={selectedBank}
+          onChange={onChange}
+          tabIndex={0}
+          aria-describedby="bank-help"
+          aria-invalid={getFieldValidation('bank')?.type === 'error' ? 'true' : 'false'}
+          aria-expanded="false"
+          className={
+            getFieldValidation('bank')?.type === 'error'
+              ? 'invalid'
+              : getFieldValidation('bank')?.type === 'success'
+              ? 'valid'
+              : ''
+          }
+        >
+          {sortedBanks.map(([bic, bank]) => (
+            <option key={bic} value={bic}>
+              {bank.name || bic}
+            </option>
+          ))}
+        </select>
+        <p id="bank-help" className="help-text">
+          {t('form.bank.help', { country: COUNTRY_NAMES[selectedCountry] || selectedCountry })}
+        </p>
+        {errors.bank && (
+          <p className="error-message has-error" role="alert">
+            {errors.bank}
+          </p>
+        )}
+      </div>
+    );
+  }
+);
+
+interface QuantityInputProps {
+  quantity: number;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  getFieldValidation: (field: string) => { type: string; message?: string } | null;
+  deferredQuantity: number;
+  t: (key: string, options?: any) => string;
+}
+
+const QuantityInput = memo(({ quantity, onChange, getFieldValidation, deferredQuantity, t }: QuantityInputProps) => (
+  <div className="form-group has-validation form-field-enhanced">
+    <label htmlFor="quantity">{t('form.quantity.label')}</label>
+    <input
+      type="number"
+      id="quantity"
+      name="quantity"
+      value={quantity}
+      min="1"
+      max="100"
+      onChange={onChange}
+      required
+      autoComplete="off"
+      aria-describedby="quantity-help"
+      aria-invalid={getFieldValidation('quantity')?.type === 'error' ? 'true' : 'false'}
+      className={
+        getFieldValidation('quantity')?.type === 'error'
+          ? 'invalid'
+          : getFieldValidation('quantity')?.type === 'success'
+          ? 'valid'
+          : ''
+      }
+    />
+    <p id="quantity-help" className="help-text">
+      {t('form.quantity.help')}
+    </p>
+    {getFieldValidation('quantity')?.type === 'error' && (
+      <p className={`error-message has-error ${deferredQuantity > MAX_QUANTITY ? 'critical' : ''}`} role="alert">
+        {getFieldValidation('quantity')?.message}
+      </p>
+    )}
+  </div>
+));
 
 /**
  * Factory instance created outside component scope to prevent re-instantiation
@@ -34,13 +232,16 @@ interface IBANFormProps {
 
 export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGenerating, errors }) => {
   const { t } = useTranslation();
-  
-  // Initialize form state with suggested country based on user's locale
-  const [formData, setFormData] = useState<FormData>({
-    country: getSuggestedCountry(),
-    bank: '',
-    quantity: 1,
-  });
+
+  const [selectedCountry, setSelectedCountry] = useState(getSuggestedCountry());
+  const [selectedBank, setSelectedBank] = useState('');
+  const [quantity, setQuantity] = useState(1);
+
+  const formData: FormData = {
+    country: selectedCountry,
+    bank: selectedBank,
+    quantity,
+  };
   
   // Bank selector state management for dynamic bank loading
   const [showBankSelector, setShowBankSelector] = useState(false);
@@ -81,7 +282,7 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
       updateTimeoutRef.current = null;
     }
 
-    const banksForCountry = BANK_DATA[formData.country];
+    const banksForCountry = BANK_DATA[selectedCountry];
     setIsBanksLoading(true);
     
     // 🐛 FIX: Use timeout to prevent race conditions during rapid country switching
@@ -94,23 +295,15 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
         if (banksForCountry && Object.keys(banksForCountry).length > 0) {
           setAvailableBanks(banksForCountry);
           setShowBankSelector(true);
-          
-          // Smart bank selection: preserve current selection if valid, otherwise pick first available
-          setFormData(prev => {
-            const currentBank = prev.bank;
-            const isCurrentBankValid = currentBank && banksForCountry[currentBank];
-            const firstBankKey = Object.keys(banksForCountry)[0];
-            
-            return {
-              ...prev,
-              bank: isCurrentBankValid ? currentBank : firstBankKey
-            };
-          });
+
+          const isCurrentBankValid = selectedBank && banksForCountry[selectedBank];
+          const firstBankKey = Object.keys(banksForCountry)[0];
+          setSelectedBank(isCurrentBankValid ? selectedBank : firstBankKey);
         } else {
           // Handle countries without specific bank data
           setAvailableBanks({});
           setShowBankSelector(false);
-          setFormData(prev => ({ ...prev, bank: '' }));
+          setSelectedBank('');
         }
         
         setIsBanksLoading(false);
@@ -118,36 +311,22 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
       });
     }, 100); // Small delay to debounce rapid changes
 
-  }, [formData.country]);
+  }, [selectedCountry]);
 
   const handleCountryChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-    // Prevent event propagation that might interfere with dropdown behavior
     event.stopPropagation();
-    
-    setFormData(prev => ({
-      ...prev,
-      country: event.target.value,
-    }));
+    setSelectedCountry(event.target.value);
   }, []);
 
   const handleBankChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-    // Prevent event propagation that might interfere with dropdown behavior
     event.stopPropagation();
-    
-    setFormData(prev => ({
-      ...prev,
-      bank: event.target.value,
-    }));
+    setSelectedBank(event.target.value);
   }, []);
 
   const handleQuantityChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    // Prevent event propagation that might interfere with form behavior
     event.stopPropagation();
     const value = parseInt(event.target.value) || 1;
-    setFormData(prev => ({
-      ...prev,
-      quantity: value,
-    }));
+    setQuantity(value);
   }, []);
 
   // Handle click events on form elements to prevent interference
@@ -188,116 +367,41 @@ export const IBANForm: React.FC<IBANFormProps> = memo(({ onGenerate, isGeneratin
       <fieldset>
         <legend className="form-section-heading">{t('form.legend')}</legend>
 
-        <div className="form-group has-validation form-field-enhanced">
-          <label htmlFor="country">{t('form.country.label')}</label>
-          <select
-            ref={countrySelectRef}
-            id="country"
-            name="country"
-            value={formData.country}
-            onChange={handleCountryChange}
-            required
-            tabIndex={0}
-            aria-describedby="country-help"
-            aria-invalid={getFieldValidation('country')?.type === 'error' ? 'true' : 'false'}
-            aria-expanded="false"
-            className={getFieldValidation('country')?.type === 'error' ? 'invalid' : 
-                      getFieldValidation('country')?.type === 'success' ? 'valid' : ''}
-          >
-            {sortedCountries.map((countryCode: string) => (
-              <option key={countryCode} value={countryCode}>
-                {COUNTRY_NAMES[countryCode] || countryCode}
-              </option>
-            ))}
-          </select>
-          <p id="country-help" className="help-text">
-            {t('form.country.help')}
-          </p>
-          {errors.country && (
-            <p className="error-message has-error" role="alert">
-              {errors.country}
-            </p>
-          )}
-        </div>
+        <CountrySelector
+          sortedCountries={sortedCountries}
+          selectedCountry={selectedCountry}
+          onChange={handleCountryChange}
+          errors={errors}
+          getFieldValidation={getFieldValidation}
+          t={t}
+          countrySelectRef={countrySelectRef}
+        />
 
-        {isBanksLoading ? (
-          <div className="form-group">
-            <label>{t('form.bank.label')}</label>
-            <SkeletonLoader rows={1} />
-            <p className="help-text">{t('form.bank.loading')}</p>
-          </div>
-        ) : showBankSelector ? (
-          <div className="form-group has-validation form-field-enhanced" id="bank-container">
-            <label htmlFor="bank">{t('form.bank.label')}</label>
-            <select
-              ref={bankSelectRef}
-              id="bank"
-              name="bank"
-              value={formData.bank}
-              onChange={handleBankChange}
-              tabIndex={0}
-              aria-describedby="bank-help"
-              aria-invalid={getFieldValidation('bank')?.type === 'error' ? 'true' : 'false'}
-              aria-expanded="false"
-              className={getFieldValidation('bank')?.type === 'error' ? 'invalid' : 
-                        getFieldValidation('bank')?.type === 'success' ? 'valid' : ''}
-            >
-              {sortedBanks.map(([bic, bank]) => (
-                <option key={bic} value={bic}>
-                  {bank.name || bic}
-                </option>
-              ))}
-            </select>
-            <p id="bank-help" className="help-text">
-              {t('form.bank.help', { country: COUNTRY_NAMES[formData.country] || formData.country })}
-            </p>
-            {errors.bank && (
-              <p className="error-message has-error" role="alert">
-                {errors.bank}
-              </p>
-            )}
-          </div>
-        ) : (
-          <div className="form-group">
-            <p className="help-text">
-              {t('form.bank.noSpecificBanks', { country: COUNTRY_NAMES[formData.country] || formData.country })}
-            </p>
-          </div>
-        )}
+        <BankSelector
+          isBanksLoading={isBanksLoading}
+          showBankSelector={showBankSelector}
+          sortedBanks={sortedBanks}
+          selectedBank={selectedBank}
+          onChange={handleBankChange}
+          errors={errors}
+          getFieldValidation={getFieldValidation}
+          t={t}
+          bankSelectRef={bankSelectRef}
+          selectedCountry={selectedCountry}
+        />
 
-        <div className="form-group has-validation form-field-enhanced">
-          <label htmlFor="quantity">{t('form.quantity.label')}</label>
-          <input
-            type="number"
-            id="quantity"
-            name="quantity"
-            value={formData.quantity}
-            min="1"
-            max="100"
-            onChange={handleQuantityChange}
-            required
-            autoComplete="off"
-            aria-describedby="quantity-help"
-            aria-invalid={getFieldValidation('quantity')?.type === 'error' ? 'true' : 'false'}
-            className={getFieldValidation('quantity')?.type === 'error' ? 'invalid' : 
-                      getFieldValidation('quantity')?.type === 'success' ? 'valid' : ''}
-          />
-          <p id="quantity-help" className="help-text">
-            {t('form.quantity.help')}
-          </p>
-          {getFieldValidation('quantity')?.type === 'error' && (
-            <p className={`error-message has-error ${
-              deferredFormData.quantity > MAX_QUANTITY ? 'critical' : ''
-            }`} role="alert">
-              {getFieldValidation('quantity')?.message}
-            </p>
-          )}
-        </div>
+        <QuantityInput
+          quantity={quantity}
+          onChange={handleQuantityChange}
+          getFieldValidation={getFieldValidation}
+          deferredQuantity={deferredFormData.quantity}
+          t={t}
+        />
 
         {errors.general && (
           <div className="form-group">
             <p className="error-message has-error" role="alert">
-              {errors.general}
+              {sanitizeErrorMessage(errors.general)}
             </p>
           </div>
         )}
