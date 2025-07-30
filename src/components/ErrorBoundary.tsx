@@ -25,8 +25,8 @@ return { hasError: true, error };
 public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
 console.error(‘ErrorBoundary caught an error:’, error, errorInfo);
 
-```
 // Use your advanced ErrorLogger with rich context
+ErrorLogger.log(error, { 
 ErrorLogger.log(error, { 
   componentStack: errorInfo.componentStack,
   userAgent: navigator.userAgent,
