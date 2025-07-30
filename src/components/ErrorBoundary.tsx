@@ -27,7 +27,6 @@ console.error(‘ErrorBoundary caught an error:’, error, errorInfo);
 
 // Use your advanced ErrorLogger with rich context
 ErrorLogger.log(error, { 
-ErrorLogger.log(error, { 
   componentStack: errorInfo.componentStack,
   userAgent: navigator.userAgent,
   url: window.location.href,
