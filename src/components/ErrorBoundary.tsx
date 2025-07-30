@@ -56,7 +56,7 @@ if (this.state.hasError) {
           <button 
             className="btn btn-primary"
             onClick={() => {
-              ErrorLogger.log('ErrorBoundary action', {
+              ErrorLogger.log(new Error('ErrorBoundary action'), {
                 action: 'error_boundary_refresh',
                 errorName: this.state.error?.name,
                 errorMessage: this.state.error?.message
