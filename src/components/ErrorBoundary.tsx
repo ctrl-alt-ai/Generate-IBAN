@@ -70,7 +70,8 @@ if (this.state.hasError) {
           <button 
             className="btn btn-secondary"
             onClick={() => {
-              ErrorLogger.logAction('error_boundary_retry', {
+              ErrorLogger.log('ErrorBoundary action', {
+                action: 'error_boundary_retry',
                 errorName: this.state.error?.name,
                 errorMessage: this.state.error?.message
               });
