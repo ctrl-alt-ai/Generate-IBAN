@@ -127,7 +127,7 @@ const resources = {
         generateFailed: 'Kon geen IBANs genereren voor {{country}}.',
         partialFailure: 'Let op: {{failures}} van de {{total}} IBANs konden niet worden gegenereerd.',
         unexpectedError: 'Er is een onverwachte fout opgetreden bij het genereren van IBANs. Probeer het opnieuw.',
-        jsRequired: 'JavaScript is vereist voor deze tool. Schakel JavaScript in uw browser in.'
+        jsRequired: 'JavaScript is vereist voor deze tool. Schakel JavaScript in uw browser in.',
         somethingWentWrong: 'Er ging iets mis',
         unexpectedErrorDescription: 'Het spijt ons, maar er is iets onverwachts gebeurd. Probeer de pagina te vernieuwen of neem contact op met de ondersteuning als het probleem aanhoudt.',
         errorDetails: 'Foutdetails',
