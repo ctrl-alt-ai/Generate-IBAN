@@ -85,7 +85,6 @@ if (this.state.hasError) {
 }
 
 return this.props.children;
-```
 
 }
 }
