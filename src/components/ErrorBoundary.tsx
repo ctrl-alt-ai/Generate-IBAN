@@ -36,14 +36,11 @@ ErrorLogger.log(error, {
   userId: 'anonymous',
   sessionId: Math.random().toString(36).substr(2, 9)
 });
-```
 
 }
 
 public render() {
 const { t } = this.props;
-
-```
 if (this.state.hasError) {
   return (
     <div className="error-boundary">
