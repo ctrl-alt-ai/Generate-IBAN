@@ -62,6 +62,11 @@ const resources = {
         partialFailure: 'Note: {{failures}} out of {{total}} IBANs could not be generated.',
         unexpectedError: 'An unexpected error occurred while generating IBANs. Please try again.',
         jsRequired: 'JavaScript is required for this tool to function. Please enable JavaScript in your browser.'
+        somethingWentWrong: 'Something went wrong',
+        unexpectedErrorDescription: 'We\'re sorry, but something unexpected happened. Please try refreshing the page or contact support if the problem persists.',
+        errorDetails: 'Error Details',
+        refreshPage: 'Refresh Page',
+        tryAgain: 'Try Again',
       }
     }
   },
@@ -123,6 +128,11 @@ const resources = {
         partialFailure: 'Let op: {{failures}} van de {{total}} IBANs konden niet worden gegenereerd.',
         unexpectedError: 'Er is een onverwachte fout opgetreden bij het genereren van IBANs. Probeer het opnieuw.',
         jsRequired: 'JavaScript is vereist voor deze tool. Schakel JavaScript in uw browser in.'
+        somethingWentWrong: 'Er ging iets mis',
+        unexpectedErrorDescription: 'Het spijt ons, maar er is iets onverwachts gebeurd. Probeer de pagina te vernieuwen of neem contact op met de ondersteuning als het probleem aanhoudt.',
+        errorDetails: 'Foutdetails',
+        refreshPage: 'Pagina Vernieuwen',
+        tryAgain: 'Probeer Opnieuw',
       }
     }
   },
@@ -184,6 +194,11 @@ const resources = {
         partialFailure: 'Hinweis: {{failures}} von {{total}} IBANs konnten nicht generiert werden.',
         unexpectedError: 'Ein unerwarteter Fehler ist beim Generieren der IBANs aufgetreten. Bitte versuchen Sie es erneut.',
         jsRequired: 'JavaScript ist für dieses Tool erforderlich. Bitte aktivieren Sie JavaScript in Ihrem Browser.'
+        somethingWentWrong: 'Etwas ist schief gelaufen',
+        unexpectedErrorDescription: 'Es tut uns leid, aber etwas Unerwartetes ist passiert. Bitte versuchen Sie, die Seite zu aktualisieren, oder wenden Sie sich an den Support, wenn das Problem weiterhin besteht.',
+        errorDetails: 'Fehlerdetails',
+        refreshPage: 'Seite Aktualisieren',
+        tryAgain: 'Erneut Versuchen',
       }
     }
   }
