@@ -26,11 +26,15 @@ public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
 console.error(‘ErrorBoundary caught an error:’, error, errorInfo);
 
 ```
-// Log error with context
+// Use your advanced ErrorLogger with rich context
 ErrorLogger.log(error, { 
   componentStack: errorInfo.componentStack,
   userAgent: navigator.userAgent,
-  url: window.location.href 
+  url: window.location.href,
+  source: 'ErrorBoundary',
+  severity: 'high',
+  userId: 'anonymous',
+  sessionId: Math.random().toString(36).substr(2, 9)
 });
 ```
 
@@ -55,13 +59,25 @@ if (this.state.hasError) {
         <div className="button-group">
           <button 
             className="btn btn-primary"
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              ErrorLogger.logAction('error_boundary_refresh', {
+                errorName: this.state.error?.name,
+                errorMessage: this.state.error?.message
+              });
+              window.location.reload();
+            }}
           >
             {t('errors.refreshPage')}
           </button>
           <button 
             className="btn btn-secondary"
-            onClick={() => this.setState({ hasError: false, error: null })}
+            onClick={() => {
+              ErrorLogger.logAction('error_boundary_retry', {
+                errorName: this.state.error?.name,
+                errorMessage: this.state.error?.message
+              });
+              this.setState({ hasError: false, error: null });
+            }}
           >
             {t('errors.tryAgain')}
           </button>
@@ -77,5 +93,4 @@ return this.props.children;
 }
 }
 
-// Export with HOC for i18n support
 export const ErrorBoundary = withTranslation()(ErrorBoundaryComponent);
