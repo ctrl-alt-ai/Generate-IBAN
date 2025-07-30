@@ -61,7 +61,7 @@ const resources = {
         generateFailed: 'Failed to generate any IBANs for {{country}}.',
         partialFailure: 'Note: {{failures}} out of {{total}} IBANs could not be generated.',
         unexpectedError: 'An unexpected error occurred while generating IBANs. Please try again.',
-        jsRequired: 'JavaScript is required for this tool to function. Please enable JavaScript in your browser.'
+        jsRequired: 'JavaScript is required for this tool to function. Please enable JavaScript in your browser.',
         somethingWentWrong: 'Something went wrong',
         unexpectedErrorDescription: 'We\'re sorry, but something unexpected happened. Please try refreshing the page or contact support if the problem persists.',
         errorDetails: 'Error Details',
