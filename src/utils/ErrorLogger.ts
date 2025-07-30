@@ -1,5 +1,5 @@
 export class ErrorLogger {
-  static log(error: Error, context: Record<string, any> = {}): void {
+  static log(error: Error, context: Record<string, unknown> = {}): void {
     if (process.env.NODE_ENV === 'production') {
       // Placeholder for real logging service integration
       console.error('Production Error:', { error, context });
