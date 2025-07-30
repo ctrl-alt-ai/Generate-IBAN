@@ -1,50 +1,81 @@
-import { Component } from 'react';
-import type { ErrorInfo, ReactNode } from 'react';
-import { ErrorLogger } from '../utils/ErrorLogger';
+import { Component } from ‘react’;
+import type { ErrorInfo, ReactNode } from ‘react’;
+import { withTranslation, WithTranslation } from ‘react-i18next’;
+import { ErrorLogger } from ‘../utils/ErrorLogger’;
 
-interface Props {
-  children: ReactNode;
+interface Props extends WithTranslation {
+children: ReactNode;
 }
 
 interface State {
-  hasError: boolean;
-  error: Error | null;
+hasError: boolean;
+error: Error | null;
 }
 
-export class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false,
-    error: null
-  };
+class ErrorBoundaryComponent extends Component<Props, State> {
+public state: State = {
+hasError: false,
+error: null
+};
 
-  public static getDerivedStateFromError(error: Error): State {
-    // Update state so the next render will show the fallback UI
-    return { hasError: true, error };
-  }
+public static getDerivedStateFromError(error: Error): State {
+return { hasError: true, error };
+}
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    ErrorLogger.log(error, {
-      componentStack: errorInfo.componentStack,
-      userAgent: navigator.userAgent,
-      url: window.location.href,
-    });
-  }
+public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+console.error(‘ErrorBoundary caught an error:’, error, errorInfo);
 
-  public render() {
-    if (this.state.hasError) {
-      return (
-        <div className="error-boundary">
-          <h2>Er ging iets mis</h2>
-          <details>
-            <summary>Technical Details</summary>
-            <pre>{this.state.error?.stack}</pre>
-          </details>
-          <button onClick={() => window.location.reload()}>Probeer Opnieuw</button>
-          <button onClick={() => this.setState({ hasError: false })}>Ga Verder</button>
+```
+// Log error with context
+ErrorLogger.log(error, { 
+  componentStack: errorInfo.componentStack,
+  userAgent: navigator.userAgent,
+  url: window.location.href 
+});
+```
+
+}
+
+public render() {
+const { t } = this.props;
+
+```
+if (this.state.hasError) {
+  return (
+    <div className="error-boundary">
+      <div className="error-boundary-content">
+        <h2>{t('errors.somethingWentWrong')}</h2>
+        <p>{t('errors.unexpectedErrorDescription')}</p>
+        
+        <details className="error-details">
+          <summary>{t('errors.errorDetails')}</summary>
+          <pre>{this.state.error?.toString()}</pre>
+        </details>
+        
+        <div className="button-group">
+          <button 
+            className="btn btn-primary"
+            onClick={() => window.location.reload()}
+          >
+            {t('errors.refreshPage')}
+          </button>
+          <button 
+            className="btn btn-secondary"
+            onClick={() => this.setState({ hasError: false, error: null })}
+          >
+            {t('errors.tryAgain')}
+          </button>
         </div>
-      );
-    }
-
-    return this.props.children;
-  }
+      </div>
+    </div>
+  );
 }
+
+return this.props.children;
+```
+
+}
+}
+
+// Export with HOC for i18n support
+export const ErrorBoundary = withTranslation()(ErrorBoundaryComponent);
